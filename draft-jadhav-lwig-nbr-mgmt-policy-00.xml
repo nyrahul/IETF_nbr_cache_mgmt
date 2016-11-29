@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!-- This template is for creating an Internet Draft using xml2rfc,
+     which is available here: http://xml.resource.org. -->
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!-- One method to get references from the online citation libraries.
+     There has to be one entity for each item to be referenced. 
+     An alternate method (rfc include) is described in the references. -->
+
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+<!ENTITY RFC3552 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3552.xml">
+<!ENTITY RFC6550 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6550.xml">
+<!ENTITY RFC6775 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6775.xml">
+<!ENTITY RFC5191 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5191.xml">
+<!ENTITY I-D.narten-iana-considerations-rfc2434bis SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.narten-iana-considerations-rfc2434bis.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs), 
+     please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space 
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="info" docName="draft-jadhav-lwig-nbr-mgmt-policy-00" ipr="trust200902">
+  <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN" 
+     they will automatically be output with "(if approved)" -->
+
+  <!-- ***** FRONT MATTER ***** -->
+
+  <front>
+    <!-- The abbreviated title is used in the page header - it is only necessary if the 
+         full title is longer than 39 characters -->
+
+    <title abbrev="Neighbor Management Policy for 6LoWPAN">Neighbor Management Policy for 6LoWPAN</title>
+    
+    <author fullname="Rahul Arvind Jadhav" initials="R.A." role="editor" surname="Jadhav">
+      <organization>Huawei Tech</organization>
+      <address>
+        <postal>
+          <street></street>
+          <city>Bangalore</city>
+          <region></region>
+          <code>560037</code>
+          <country>India</country>
+        </postal>
+        <phone></phone>
+        <email>rahul.ietf@gmail.com</email>
+      </address>
+    </author>
+    <author fullname="Rabi Narayan Sahoo" initials="R.N." surname="Sahoo">
+      <organization>Huawei Tech</organization>
+      <address>
+        <postal>
+          <street></street>
+          <city>Bangalore</city>
+          <region></region>
+          <code>560037</code>
+          <country>India</country>
+        </postal>
+        <phone></phone>
+        <email>rabinarayan@huawei.com</email>
+      </address>
+    </author>
+    <author fullname="Simon Duquennoy" initials="S.D." surname="Duquennoy">
+      <organization>SICS</organization>
+      <address>
+        <postal>
+          <street></street>
+          <city>TODO</city>
+          <region></region>
+          <code></code>
+          <country>TODO</country>
+        </postal>
+        <phone></phone>
+        <email>simon.duquennoy@inria.fr</email>
+      </address>
+    </author>
+    <author fullname="Joakim Eriksson" initials="J.E." surname="Eriksson">
+      <organization>SICS</organization>
+      <address>
+        <postal>
+          <street></street>
+          <city>TODO</city>
+          <region></region>
+          <code></code>
+          <country>TODO</country>
+        </postal>
+        <phone></phone>
+        <email>joakime@sics.se</email>
+      </address>
+    </author>
+
+    <date month="December" year="2016" />
+
+    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
+         in the current day for you. If only the current year is specified, xml2rfc will fill 
+	 in the current day and month for you. If the year is not the current one, it is 
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the 
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to 
+	 specify just the year. -->
+
+    <!-- Meta-data Declarations -->
+
+    <area>General</area>
+
+    <workgroup>LWIG</workgroup>
+
+    <!-- WG name at the upperleft corner of the doc,
+         IETF is fine for individual submissions.  
+	 If this element is not present, the default is "Network Working Group",
+         which is used by the RFC Editor as a nod to the history of the IETF. -->
+
+    <keyword>template</keyword>
+
+    <!-- Keywords will be incorporated into HTML output
+         files in a meta tag but they have no effect on text or nroff
+         output. If you submit your draft to the RFC Editor, the
+         keywords will be used for the search engine. -->
+
+    <abstract>
+      <t>This document describes the problems associated with neighbor management in multihop networks and a sample neighbor management policy to deal with it. With increase in node density, an efficient neighbor management policy helps to achieve stability in the network.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t> In a wireless multihop network, the node densities may vary
+   significantly depending upon deployments/scenarios. While there is
+   some policy control possible with regards to the network size in
+   terms of maximum number of devices connected, it is especially
+   difficult to set a figure on what will be the maximum node density
+   given a deployment. For e.g. A network can put an upper limit on  max
+   1000 devices but it is impossible to state what the node density will
+   be in this 1000 node network. Node density refers to maximum number
+   of devices connected on a single link. </t>
+
+   <t>A neighbor cache is usually used for populating neighboring
+   one-hop connected nodes information such as MAC address, link local
+   IP address and other state information. Node density has direct
+   implications on the neighbor cache and in constrained network
+   scenario the size of the neighbor cache will be limited. Thus there
+   are chances that a node may not be able to fit all the neighboring
+   nodes in its table cache in which case it has to prioritize entries
+   and thus needs a neighbor management policy.</t>
+
+   <t>In this draft, we present problems related to neighbor management
+   policies by considering a security-enabled multi-hop 6lo 
+   network. We specifically consider RPL<xref target="RFC6550"></xref> as a routing protocol
+   and PANA(EAP-PANA)<xref target="RFC5191"></xref> as a network access protocol. For RPL,
+   both the storing and non-storing mode of operations are considered.
+   We also provide a sample neighbor management policy which can be used
+   in such networks with its limitations/assumptions.</t>
+
+   <t>For the rest of this document consider the following topology:
+   <figure align="center" anchor="sample_top">
+        <!-- <preamble>Preamble text - can be omitted or empty.</preamble> -->
+
+        <artwork align="center"><![CDATA[
+                    +--------+
+                    | PAA/   |
+             +------| Auth   |
+             |      | Server |
+             |      +--------+
++------------|-------------+ 
+|            |             |
+|          (BR)            | 
+|          / \             |
+|         /   \            |
+|        /     \           |
+|      (N1)   (N2)         |
+|        :     / \         |
+|         :   /   \        |
+|          : /     \       |
+|          (N3)   (N4)     |
+|          / \     :       |
+|         /   \   :        |
+|        /     \ :         |
+|      (N5)   (New)        |
+|      / \                 |
+|     /   \                |
+|    /     \               |
+|  (N6)   (N7)             |
+|                          |
+|        6Lo Network       |
++--------------------------+ 
+            ]]></artwork>
+
+        <postamble>Sample Topology (subject to change) </postamble>
+      </figure>
+    </t>
+        <section title="Requirements Language and Terminology">
+            <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+            "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+            document are to be interpreted as described in <xref
+            target="RFC2119">RFC 2119</xref>.</t>
+
+            <t>PaC: PANA Client</t>
+            <t>PRE: PANA Relay Element</t>
+            <t>PAA: PANA Auth Agent</t>
+            <t>Routing Direct Child: </t>
+            <t>Routing Parent: </t>
+            <t>Neighbor Cache Entry (NCE) </t>
+            <t>This document also uses terminology described in <xref target="RFC6550"></xref>.</t>
+        </section>
+      
+    </section>
+
+    <section anchor="nbr_mgmt" title="Neighbor Management">
+        <section title="Significance of Neighbor management policy">
+            <t>Multihop mesh networks present unique challenges to neighbor management especially with resource constrained nodes. In class A devices for e.g. telos motes maximum x nodes can be provisioned as neighbors.</t>
+
+            <t>In case of key management protocols deployed above MAC layer in multihop network, the neighbor management kicks in early even before the routing adjacencies are established. Since a new joining node needs to discover/attach to a relay element for completing its authentication procedure, the neighbor table entries have to be appropriately populated both on a PaC and on the PRE. </t>
+
+            <t>Link estimation alone won't help since in dense deployments the number of directly attached neighbors with good quality links might still be higher than the max entries in nbr cache.</t>
+        </section>
+        <section title="Trivial neighbor management policies">
+            <t><list style="numbers">
+            <t>FCFS policy</t>
+            <t>LRU policy</t>
+            </list> How it works? Problems with these policies.</t>
+        </section>
+        <section title="Lifecycle of a neighbor entry">
+            <section title="Insertion">
+                <t>Cases where nbr entry is added:</t>
+                    <t>PAC_Pre-auth: PaC node needs to add PRE node's neighbor entry</t>
+                    <t>PRE_Pre-auth: PRE node needs to add PaC nodes neighbor entry</t>
+                    <t>RPL-Parent: </t>
+                    <t>RPL-Direct child: </t>
+                    <t>Runtime using NS/NA</t>
+            </section>
+            <section title="Eviction">
+                <t>faster eviction of unwanted entries
+                Post authentication, the new joining node may not necessarily select the same relay element as a parent node. In such cases, it is better to evict
+                Parent switching can be a cause lot of unwanted entries. Require optimized route invalidation.                
+                Impact of direct child eviction</t>
+            </section>
+            <section title="Reinforcement">
+                <t>talk about how to maintain entry freshness, estimation parameters etc</t>
+                <t>Sample mechanism employed by Contiki for link estimation and reinforcement.</t>
+                <t>Role of link estimation techniques to prioritize.</t>
+            </section>
+        </section>
+        <section title="Approaches to neighbor management policy">
+            <section title="Proactive Approach">
+                <t>Is it possible for the child nodes to select parents according to their space availability? In this case, parents need to advertise the free space availability. This is a complex scheme ...blah blah </t>
+            </section>
+            <section title="Reactive Approach">
+                <t>Nodes try to join and then fail if space is not available. Easier to implement, more deterministic ... blah</t>
+            </section>
+        </section>
+        <section title="Requirements of a good neighbor management policy">
+            <t><list style="letters">
+                <t>Easy to implement</t>
+                <t>Less control overhead</t>
+                <t>stability of paths, deterministic routes</t>
+                <t>blah</t>
+            </list> blahblah.</t>
+        </section>
+    </section>
+    <section title="Reservation based Neighbor Management Policy">
+        <t>Reservation for direct childs and pre-auth entries. Parent nodes can still occupy the reserved entries since they could be evicted if necessary.
+        Describe the actual policy here.</t>
+        <t><figure align="center" anchor="reserv_table">
+        <!-- <preamble>Preamble text - can be omitted or empty.</preamble> -->
+
+        <artwork align="center"><![CDATA[
+<- - - - - - - - - - - Routing Parents - - - - - - - - - - - - ->
++----------------------+----------------------------------------+
+|                      |                              |         |
++----------------------+------------------------------+---------+
+  Routing Direct-Child                                  Pre-Auth
+            ]]></artwork>
+
+        <postamble>Reservation for neighbors based on function</postamble>
+        </figure>
+        </t>
+
+        <section title="Updates in table structures">
+            <t>
+            Show various fields of neighbor table, routing table and their relation. Explain newly added fields such as Reason field.
+            Storing mode table mapping: 
+            Non-storing mode table mapping:
+            </t>
+        </section>
+        <section title="Failure handling">
+            <t>How to handle DAO rejection when NBR table is full? </t>
+            <t>How to handle PANA rejection when NBR table is full? </t>
+            <t>How to handle NS rejection when NBR table is full? What does 6Lowpan-ND say in the context?</t>
+        </section>
+        <section title="Limitations of such a policy">
+            <t>May result in sub-optimal paths.</t>
+            <t>Certain scenarios where node density is not high enough, it may result in some nodes getting starved i.e. never able to get any free slot and thus never able to join.</t>
+        </section>
+        
+    </section>
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>This template was derived from an initial version written by Pekka
+      Savola and contributed by him to the xml2rfc project.</t>
+
+      <t>This document is part of a plan to make xml2rfc indispensable <xref
+      target="DOMINATION"></xref>.</t>
+    </section>
+
+    <!-- Possibly a 'Contributors' section ... -->
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This memo includes no request to IANA.</t>
+
+      <t>All drafts are required to have an IANA considerations section (see
+      <xref target="I-D.narten-iana-considerations-rfc2434bis">the update of
+      RFC 2434</xref> for a guide). If the draft does not require IANA to do
+      anything, the section contains an explicit statement that this is the
+      case (as above). If there are no requirements for IANA, the section will
+      be removed during conversion into an RFC by the RFC Editor.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>All drafts are required to have a security considerations section.
+      See <xref target="RFC3552">RFC 3552</xref> for a guide.</t>
+    </section>
+  </middle>
+
+  <!--  *****BACK MATTER ***** -->
+
+  <back>
+    <!-- References split into informative and normative -->
+
+    <!-- There are 2 ways to insert reference entries from the citation libraries:
+     1. define an ENTITY at the top, and use "ampersand character"RFC2629; here (as shown)
+     2. simply use a PI "less than character"?rfc include="reference.RFC.2119.xml"?> here
+        (for I-Ds: include="reference.I-D.narten-iana-considerations-rfc2434bis.xml")
+
+     Both are cited textually in the same manner: by using xref elements.
+     If you use the PI option, xml2rfc will, by default, try to find included files in the same
+     directory as the including file. You can also define the XML_LIBRARY environment variable
+     with a value containing a set of directories to search.  These can be either in the local
+     filing system or remote ones accessed by http (http://domain/dir/... ).-->
+
+    <references title="Normative References">
+      <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
+      &RFC2119;
+
+        <reference anchor="woo_et_al">
+        <!-- the following is the minimum to make xml2rfc happy -->
+
+            <front>
+                <title>Taming the Underlying Challenges of Reliable Multihop Routing in Sensor Networks</title>
+                <author initials="Alec" surname="Woo">
+                    <organization>University of California</organization>
+                </author>
+                <author initials="Terence" surname="Tong">
+                    <organization>University of California</organization>
+                </author>
+                <author initials="David" surname="Culler">
+                    <organization>Intel Corp</organization>
+                </author>
+                <date year="2003" />
+            </front>
+        </reference>
+    </references>
+
+    <references title="Informative References">
+      <!-- Here we use entities that we defined at the beginning. -->
+
+      &RFC3552;
+
+      &RFC6550;
+      
+      &RFC6775;
+
+      &RFC5191;
+
+      &I-D.narten-iana-considerations-rfc2434bis;
+
+      <!-- A reference written by by an organization not a person. -->
+
+      <reference anchor="DOMINATION"
+                 target="http://www.example.com/dominator.html">
+        <front>
+          <title>Ultimate Plan for Taking Over the World</title>
+
+          <author>
+            <organization>Mad Dominators, Inc.</organization>
+          </author>
+
+          <date year="1984" />
+        </front>
+      </reference>
+    </references>
+
+    <section anchor="app-additional" title="Additional Stuff">
+      <t>This becomes an Appendix.</t>
+    </section>
+
+    <!-- Change Log
+
+v00 2016-11-29  RAJ   Initial version
+ -->
+  </back>
+</rfc>
