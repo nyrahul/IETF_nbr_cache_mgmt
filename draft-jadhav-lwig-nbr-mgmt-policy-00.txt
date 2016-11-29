@@ -1,0 +1,504 @@
+
+
+
+
+LWIG                                                      R. Jadhav, Ed.
+Internet-Draft                                                  R. Sahoo
+Intended status: Informational                               Huawei Tech
+Expires: June 4, 2017                                       S. Duquennoy
+                                                             J. Eriksson
+                                                                    SICS
+                                                           December 2016
+
+
+                 Neighbor Management Policy for 6LoWPAN
+                  draft-jadhav-lwig-nbr-mgmt-policy-00
+
+Abstract
+
+   This document describes the problems associated with neighbor
+   management in multihop networks and a sample neighbor management
+   policy to deal with it.  With increase in node density, an efficient
+   neighbor management policy helps to achieve stability in the network.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on June 4, 2017.
+
+Copyright Notice
+
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 1]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Requirements Language and Terminology . . . . . . . . . .   4
+   2.  Neighbor Management . . . . . . . . . . . . . . . . . . . . .   4
+     2.1.  Significance of Neighbor management policy  . . . . . . .   4
+     2.2.  Trivial neighbor management policies  . . . . . . . . . .   4
+     2.3.  Lifecycle of a neighbor entry . . . . . . . . . . . . . .   5
+       2.3.1.  Insertion . . . . . . . . . . . . . . . . . . . . . .   5
+       2.3.2.  Eviction  . . . . . . . . . . . . . . . . . . . . . .   5
+       2.3.3.  Reinforcement . . . . . . . . . . . . . . . . . . . .   5
+     2.4.  Approaches to neighbor management policy  . . . . . . . .   5
+       2.4.1.  Proactive Approach  . . . . . . . . . . . . . . . . .   5
+       2.4.2.  Reactive Approach . . . . . . . . . . . . . . . . . .   5
+     2.5.  Requirements of a good neighbor management policy . . . .   6
+   3.  Reservation based Neighbor Management Policy  . . . . . . . .   6
+     3.1.  Updates in table structures . . . . . . . . . . . . . . .   6
+     3.2.  Failure handling  . . . . . . . . . . . . . . . . . . . .   6
+     3.3.  Limitations of such a policy  . . . . . . . . . . . . . .   6
+   4.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   7
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .   7
+   Appendix A.  Additional Stuff . . . . . . . . . . . . . . . . . .   8
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   8
+
+1.  Introduction
+
+   In a wireless multihop network, the node densities may vary
+   significantly depending upon deployments/scenarios.  While there is
+   some policy control possible with regards to the network size in
+   terms of maximum number of devices connected, it is especially
+   difficult to set a figure on what will be the maximum node density
+   given a deployment.  For e.g.  A network can put an upper limit on
+   max 1000 devices but it is impossible to state what the node density
+   will be in this 1000 node network.  Node density refers to maximum
+   number of devices connected on a single link.
+
+   A neighbor cache is usually used for populating neighboring one-hop
+   connected nodes information such as MAC address, link local IP
+   address and other state information.  Node density has direct
+   implications on the neighbor cache and in constrained network
+   scenario the size of the neighbor cache will be limited.  Thus there
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 2]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+   are chances that a node may not be able to fit all the neighboring
+   nodes in its table cache in which case it has to prioritize entries
+   and thus needs a neighbor management policy.
+
+   In this draft, we present problems related to neighbor management
+   policies by considering a security-enabled multi-hop 6lo network.  We
+   specifically consider RPL[RFC6550] as a routing protocol and
+   PANA(EAP-PANA)[RFC5191] as a network access protocol.  For RPL, both
+   the storing and non-storing mode of operations are considered.  We
+   also provide a sample neighbor management policy which can be used in
+   such networks with its limitations/assumptions.
+
+   For the rest of this document consider the following topology:
+
+                                          +--------+
+                                          | PAA/   |
+                                   +------| Auth   |
+                                   |      | Server |
+                                   |      +--------+
+                      +------------|-------------+
+                      |            |             |
+                      |          (BR)            |
+                      |          / \             |
+                      |         /   \            |
+                      |        /     \           |
+                      |      (N1)   (N2)         |
+                      |        :     / \         |
+                      |         :   /   \        |
+                      |          : /     \       |
+                      |          (N3)   (N4)     |
+                      |          / \     :       |
+                      |         /   \   :        |
+                      |        /     \ :         |
+                      |      (N5)   (New)        |
+                      |      / \                 |
+                      |     /   \                |
+                      |    /     \               |
+                      |  (N6)   (N7)             |
+                      |                          |
+                      |        6Lo Network       |
+                      +--------------------------+
+
+                    Sample Topology (subject to change)
+
+                                 Figure 1
+
+
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 3]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+1.1.  Requirements Language and Terminology
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC 2119 [RFC2119].
+
+   PaC: PANA Client
+
+   PRE: PANA Relay Element
+
+   PAA: PANA Auth Agent
+
+   Routing Direct Child:
+
+   Routing Parent:
+
+   Neighbor Cache Entry (NCE)
+
+   This document also uses terminology described in [RFC6550].
+
+2.  Neighbor Management
+
+2.1.  Significance of Neighbor management policy
+
+   Multihop mesh networks present unique challenges to neighbor
+   management especially with resource constrained nodes.  In class A
+   devices for e.g. telos motes maximum x nodes can be provisioned as
+   neighbors.
+
+   In case of key management protocols deployed above MAC layer in
+   multihop network, the neighbor management kicks in early even before
+   the routing adjacencies are established.  Since a new joining node
+   needs to discover/attach to a relay element for completing its
+   authentication procedure, the neighbor table entries have to be
+   appropriately populated both on a PaC and on the PRE.
+
+   Link estimation alone won't help since in dense deployments the
+   number of directly attached neighbors with good quality links might
+   still be higher than the max entries in nbr cache.
+
+2.2.  Trivial neighbor management policies
+
+   1.  FCFS policy
+
+   2.  LRU policy
+
+   How it works?  Problems with these policies.
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 4]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+2.3.  Lifecycle of a neighbor entry
+
+2.3.1.  Insertion
+
+   Cases where nbr entry is added:
+
+   PAC_Pre-auth: PaC node needs to add PRE node's neighbor entry
+
+   PRE_Pre-auth: PRE node needs to add PaC nodes neighbor entry
+
+   RPL-Parent:
+
+   RPL-Direct child:
+
+   Runtime using NS/NA
+
+2.3.2.  Eviction
+
+   faster eviction of unwanted entries Post authentication, the new
+   joining node may not necessarily select the same relay element as a
+   parent node.  In such cases, it is better to evict Parent switching
+   can be a cause lot of unwanted entries.  Require optimized route
+   invalidation.  Impact of direct child eviction
+
+2.3.3.  Reinforcement
+
+   talk about how to maintain entry freshness, estimation parameters etc
+
+   Sample mechanism employed by Contiki for link estimation and
+   reinforcement.
+
+   Role of link estimation techniques to prioritize.
+
+2.4.  Approaches to neighbor management policy
+
+2.4.1.  Proactive Approach
+
+   Is it possible for the child nodes to select parents according to
+   their space availability?  In this case, parents need to advertise
+   the free space availability.  This is a complex scheme ...blah blah
+
+2.4.2.  Reactive Approach
+
+   Nodes try to join and then fail if space is not available.  Easier to
+   implement, more deterministic ... blah
+
+
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 5]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+2.5.  Requirements of a good neighbor management policy
+
+   a.  Easy to implement
+
+   b.  Less control overhead
+
+   c.  stability of paths, deterministic routes
+
+   d.  blah
+
+   blahblah.
+
+3.  Reservation based Neighbor Management Policy
+
+   Reservation for direct childs and pre-auth entries.  Parent nodes can
+   still occupy the reserved entries since they could be evicted if
+   necessary.  Describe the actual policy here.
+
+     <- - - - - - - - - - - Routing Parents - - - - - - - - - - - - ->
+     +----------------------+----------------------------------------+
+     |                      |                              |         |
+     +----------------------+------------------------------+---------+
+       Routing Direct-Child                                  Pre-Auth
+
+                Reservation for neighbors based on function
+
+                                 Figure 2
+
+3.1.  Updates in table structures
+
+   Show various fields of neighbor table, routing table and their
+   relation.  Explain newly added fields such as Reason field.  Storing
+   mode table mapping: Non-storing mode table mapping:
+
+3.2.  Failure handling
+
+   How to handle DAO rejection when NBR table is full?
+
+   How to handle PANA rejection when NBR table is full?
+
+   How to handle NS rejection when NBR table is full?  What does
+   6Lowpan-ND say in the context?
+
+3.3.  Limitations of such a policy
+
+   May result in sub-optimal paths.
+
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 6]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+   Certain scenarios where node density is not high enough, it may
+   result in some nodes getting starved i.e. never able to get any free
+   slot and thus never able to join.
+
+4.  Acknowledgements
+
+   This template was derived from an initial version written by Pekka
+   Savola and contributed by him to the xml2rfc project.
+
+   This document is part of a plan to make xml2rfc indispensable
+   [DOMINATION].
+
+5.  IANA Considerations
+
+   This memo includes no request to IANA.
+
+   All drafts are required to have an IANA considerations section (see
+   the update of RFC 2434 [I-D.narten-iana-considerations-rfc2434bis]
+   for a guide).  If the draft does not require IANA to do anything, the
+   section contains an explicit statement that this is the case (as
+   above).  If there are no requirements for IANA, the section will be
+   removed during conversion into an RFC by the RFC Editor.
+
+6.  Security Considerations
+
+   All drafts are required to have a security considerations section.
+   See RFC 3552 [RFC3552] for a guide.
+
+7.  References
+
+7.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+   [woo_et_al]
+              Woo, Alec., Tong, Terence., and David. Culler, "Taming the
+              Underlying Challenges of Reliable Multihop Routing in
+              Sensor Networks", 2003.
+
+7.2.  Informative References
+
+   [DOMINATION]
+              Mad Dominators, Inc., "Ultimate Plan for Taking Over the
+              World", 1984, <http://www.example.com/dominator.html>.
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 7]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+   [I-D.narten-iana-considerations-rfc2434bis]
+              Narten, T. and H. Alvestrand, "Guidelines for Writing an
+              IANA Considerations Section in RFCs", draft-narten-iana-
+              considerations-rfc2434bis-09 (work in progress), March
+              2008.
+
+   [RFC3552]  Rescorla, E. and B. Korver, "Guidelines for Writing RFC
+              Text on Security Considerations", BCP 72, RFC 3552,
+              DOI 10.17487/RFC3552, July 2003,
+              <http://www.rfc-editor.org/info/rfc3552>.
+
+   [RFC5191]  Forsberg, D., Ohba, Y., Ed., Patil, B., Tschofenig, H.,
+              and A. Yegin, "Protocol for Carrying Authentication for
+              Network Access (PANA)", RFC 5191, DOI 10.17487/RFC5191,
+              May 2008, <http://www.rfc-editor.org/info/rfc5191>.
+
+   [RFC6550]  Winter, T., Ed., Thubert, P., Ed., Brandt, A., Hui, J.,
+              Kelsey, R., Levis, P., Pister, K., Struik, R., Vasseur,
+              JP., and R. Alexander, "RPL: IPv6 Routing Protocol for
+              Low-Power and Lossy Networks", RFC 6550,
+              DOI 10.17487/RFC6550, March 2012,
+              <http://www.rfc-editor.org/info/rfc6550>.
+
+   [RFC6775]  Shelby, Z., Ed., Chakrabarti, S., Nordmark, E., and C.
+              Bormann, "Neighbor Discovery Optimization for IPv6 over
+              Low-Power Wireless Personal Area Networks (6LoWPANs)",
+              RFC 6775, DOI 10.17487/RFC6775, November 2012,
+              <http://www.rfc-editor.org/info/rfc6775>.
+
+Appendix A.  Additional Stuff
+
+   This becomes an Appendix.
+
+Authors' Addresses
+
+   Rahul Arvind Jadhav (editor)
+   Huawei Tech
+   Bangalore  560037
+   India
+
+   Email: rahul.ietf@gmail.com
+
+
+
+
+
+
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 8]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+   Rabi Narayan Sahoo
+   Huawei Tech
+   Bangalore  560037
+   India
+
+   Email: rabinarayan@huawei.com
+
+
+   Simon Duquennoy
+   SICS
+   TODO
+   TODO
+
+   Email: simon.duquennoy@inria.fr
+
+
+   Joakim Eriksson
+   SICS
+   TODO
+   TODO
+
+   Email: joakime@sics.se
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 9]
