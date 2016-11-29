@@ -17,9 +17,8 @@ Expires: June 4, 2017                                       S. Duquennoy
 Abstract
 
    This document describes the problems associated with neighbor
-   management in multihop networks and a sample neighbor management
-   policy to deal with it.  With increase in node density, an efficient
-   neighbor management policy helps to achieve stability in the network.
+   management in constrained multihop networks and a sample neighbor
+   management policy to deal with it.
 
 Status of This Memo
 
@@ -53,6 +52,7 @@ Copyright Notice
 
 
 
+
 Jadhav, et al.            Expires June 4, 2017                  [Page 1]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
@@ -65,29 +65,29 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Requirements Language and Terminology . . . . . . . . . .   4
-   2.  Neighbor Management . . . . . . . . . . . . . . . . . . . . .   4
-     2.1.  Significance of Neighbor management policy  . . . . . . .   4
-     2.2.  Trivial neighbor management policies  . . . . . . . . . .   4
-     2.3.  Lifecycle of a neighbor entry . . . . . . . . . . . . . .   5
-       2.3.1.  Insertion . . . . . . . . . . . . . . . . . . . . . .   5
-       2.3.2.  Eviction  . . . . . . . . . . . . . . . . . . . . . .   5
-       2.3.3.  Reinforcement . . . . . . . . . . . . . . . . . . . .   5
-     2.4.  Approaches to neighbor management policy  . . . . . . . .   5
-       2.4.1.  Proactive Approach  . . . . . . . . . . . . . . . . .   5
-       2.4.2.  Reactive Approach . . . . . . . . . . . . . . . . . .   5
-     2.5.  Requirements of a good neighbor management policy . . . .   6
-   3.  Reservation based Neighbor Management Policy  . . . . . . . .   6
-     3.1.  Updates in table structures . . . . . . . . . . . . . . .   6
-     3.2.  Failure handling  . . . . . . . . . . . . . . . . . . . .   6
-     3.3.  Limitations of such a policy  . . . . . . . . . . . . . .   6
-   4.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   7
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
-   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
-     7.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .   7
-   Appendix A.  Additional Stuff . . . . . . . . . . . . . . . . . .   8
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   8
+   2.  Neighbor Management . . . . . . . . . . . . . . . . . . . . .   5
+     2.1.  Significance of Neighbor management policy  . . . . . . .   5
+     2.2.  Trivial neighbor management policies  . . . . . . . . . .   6
+     2.3.  Lifecycle of a neighbor entry . . . . . . . . . . . . . .   6
+       2.3.1.  Insertion . . . . . . . . . . . . . . . . . . . . . .   6
+       2.3.2.  Eviction  . . . . . . . . . . . . . . . . . . . . . .   6
+       2.3.3.  Reinforcement . . . . . . . . . . . . . . . . . . . .   6
+     2.4.  Approaches to neighbor management policy  . . . . . . . .   7
+       2.4.1.  Proactive Approach  . . . . . . . . . . . . . . . . .   7
+       2.4.2.  Reactive Approach . . . . . . . . . . . . . . . . . .   7
+     2.5.  Requirements of a good neighbor management policy . . . .   7
+   3.  Reservation based Neighbor Management Policy  . . . . . . . .   7
+     3.1.  Updates in table structures . . . . . . . . . . . . . . .   7
+     3.2.  Failure handling  . . . . . . . . . . . . . . . . . . . .   8
+     3.3.  Limitations of such a policy  . . . . . . . . . . . . . .   8
+   4.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   8
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .   9
+   Appendix A.  Additional Stuff . . . . . . . . . . . . . . . . . .  10
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  10
 
 1.  Introduction
 
@@ -101,11 +101,11 @@ Table of Contents
    will be in this 1000 node network.  Node density refers to maximum
    number of devices connected on a single link.
 
-   A neighbor cache is usually used for populating neighboring one-hop
-   connected nodes information such as MAC address, link local IP
-   address and other state information.  Node density has direct
-   implications on the neighbor cache and in constrained network
-   scenario the size of the neighbor cache will be limited.  Thus there
+   Every networked node needs to manage the neighbor entries for
+   resolving MAC addresses.  Linux and other operating systems have used
+   neighbor management policies which essentially are first-come, first-
+   serve basis.  In case of Linux, the kernel issues a warning when the
+   neighbor table overflows in which case the usual step taken is to
 
 
 
@@ -114,6 +114,14 @@ Jadhav, et al.            Expires June 4, 2017                  [Page 2]
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
+   tune the negighbor cache size.  With constrained nodes, this solution
+   does not help.
+
+   A neighbor cache is usually used for populating neighboring one-hop
+   connected nodes information such as MAC address, link local IP
+   address and other state information.  Node density has direct
+   implications on the neighbor cache and in constrained network
+   scenario the size of the neighbor cache will be limited.  Thus there
    are chances that a node may not be able to fit all the neighboring
    nodes in its table cache in which case it has to prioritize entries
    and thus needs a neighbor management policy.
@@ -124,9 +132,43 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
    PANA(EAP-PANA)[RFC5191] as a network access protocol.  For RPL, both
    the storing and non-storing mode of operations are considered.  We
    also provide a sample neighbor management policy which can be used in
-   such networks with its limitations/assumptions.
+   such networks with its limitations and assumptions.
 
    For the rest of this document consider the following topology:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 3]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
 
                                           +--------+
                                           | PAA/   |
@@ -156,19 +198,9 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
                       |        6Lo Network       |
                       +--------------------------+
 
-                    Sample Topology (subject to change)
+                              Sample Topology
 
                                  Figure 1
-
-
-
-
-
-
-Jadhav, et al.            Expires June 4, 2017                  [Page 3]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
-
 
 1.1.  Requirements Language and Terminology
 
@@ -176,47 +208,15 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
    document are to be interpreted as described in RFC 2119 [RFC2119].
 
-   PaC: PANA Client
+   PaC: PANA Client.  New joining node which is yet to be authenticated.
 
-   PRE: PANA Relay Element
+   PRE: PANA Relay Element.  An already authenticated and network joined
+   node which acts as a relay element for PaCs.
 
-   PAA: PANA Auth Agent
+   PAA: PANA Auth Agent.  Auth server which hosts the credentials
+   database.  PaC will handshake with PAA to complete authentication
+   procedure.
 
-   Routing Direct Child:
-
-   Routing Parent:
-
-   Neighbor Cache Entry (NCE)
-
-   This document also uses terminology described in [RFC6550].
-
-2.  Neighbor Management
-
-2.1.  Significance of Neighbor management policy
-
-   Multihop mesh networks present unique challenges to neighbor
-   management especially with resource constrained nodes.  In class A
-   devices for e.g. telos motes maximum x nodes can be provisioned as
-   neighbors.
-
-   In case of key management protocols deployed above MAC layer in
-   multihop network, the neighbor management kicks in early even before
-   the routing adjacencies are established.  Since a new joining node
-   needs to discover/attach to a relay element for completing its
-   authentication procedure, the neighbor table entries have to be
-   appropriately populated both on a PaC and on the PRE.
-
-   Link estimation alone won't help since in dense deployments the
-   number of directly attached neighbors with good quality links might
-   still be higher than the max entries in nbr cache.
-
-2.2.  Trivial neighbor management policies
-
-   1.  FCFS policy
-
-   2.  LRU policy
-
-   How it works?  Problems with these policies.
 
 
 
@@ -225,6 +225,78 @@ Jadhav, et al.            Expires June 4, 2017                  [Page 4]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
+
+   Routing Direct Child: A directly connected node who is part of the
+   routing table of the parent.  For e.g. in the sample topology above
+   N5 is the routing direct child for N3.  Even though N6 and N7 may
+   also be part of N3 routing table, they are not considered to be
+   routing direct childs since they are not on the same hop.
+
+   Routing Parent: In the sample topology (Figure 1), N1 and N2 are
+   possible routing parents for N3.
+
+   Neighbor Cache Entry (NCE): A neighbor entry managed on behalf of
+   directly connected peer.
+
+   This document also uses terminology described in [RFC6550] and
+   [RFC6775].
+
+2.  Neighbor Management
+
+2.1.  Significance of Neighbor management policy
+
+   Multihop mesh networks present unique challenges to neighbor
+   management especially with resource constrained nodes.  In cases
+   where the node density is higher that the neighbor cache size, the
+   entries have to be prioritized. [woo_et_al] and [Dawans_et_al] talk
+   about prioritization of neighbor entries by using link quality
+   estimation techniques.  But prioritization alone may not necessarily
+   be optimal in all cases.  The reason or function why neighbor entry
+   was added also needs to be taken in consideration.  For example,
+   evicting a routing direct child might have a ripple effect in turn
+   impacting all the sub-childs as well.
+
+   In case of key management protocols deployed above MAC layer in
+   multihop network, the neighbor management kicks in early even before
+   the routing adjacencies are established.  Since a new joining node
+   needs to discover/attach to a relay element for completing its
+   authentication procedure, the neighbor table entries have to be
+   appropriately populated both on a PaC and on the PRE.  If a neighbor
+   entry whose authentication is in progress is evicted, it may increase
+   the authentication time drastically.
+
+   Another important consideration is that with increased node density,
+   the prioritization based on link estimation parameters might not help
+   since there might be more number of well connected peers.  In dense
+   deployments the number of directly attached neighbors with good
+   quality links might still be higher than the max entries in neighbor
+   cache size.
+
+
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 5]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+2.2.  Trivial neighbor management policies
+
+   Every networked node needs to be manage the neighbor entries for
+   resolving MAC addresses.  Linux and other operating systems have used
+   neighbor management policies which essentially are first-come, first-
+   serve basis.  In case of Linux, the kernel issues a warning when the
+   neighbor table overflows in which case the usual step taken is to
+   tune the negighbor cache size.  With constrained nodes, this solution
+   does not help.
+
+   1.  FCFS policy
+
+   2.  LRU policy
+
+   How it works?  Problems with these policies.
 
 2.3.  Lifecycle of a neighbor entry
 
@@ -259,6 +331,13 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
    Role of link estimation techniques to prioritize.
 
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 6]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
 2.4.  Approaches to neighbor management policy
 
 2.4.1.  Proactive Approach
@@ -271,16 +350,6 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
    Nodes try to join and then fail if space is not available.  Easier to
    implement, more deterministic ... blah
-
-
-
-
-
-
-Jadhav, et al.            Expires June 4, 2017                  [Page 5]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
-
 
 2.5.  Requirements of a good neighbor management policy
 
@@ -316,6 +385,15 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
    relation.  Explain newly added fields such as Reason field.  Storing
    mode table mapping: Non-storing mode table mapping:
 
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 7]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
 3.2.  Failure handling
 
    How to handle DAO rejection when NBR table is full?
@@ -328,15 +406,6 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 3.3.  Limitations of such a policy
 
    May result in sub-optimal paths.
-
-
-
-
-
-Jadhav, et al.            Expires June 4, 2017                  [Page 6]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
-
 
    Certain scenarios where node density is not high enough, it may
    result in some nodes getting starved i.e. never able to get any free
@@ -370,6 +439,22 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 7.1.  Normative References
 
+
+
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 8]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+   [Dawans_et_al]
+              Dawans, Sebastien., Duquennoy, Simon., and Olivier.
+              Bonaventure, "On Link Estimation in Dense RPL
+              Deployments", 2012.
+
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
@@ -385,14 +470,6 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
    [DOMINATION]
               Mad Dominators, Inc., "Ultimate Plan for Taking Over the
               World", 1984, <http://www.example.com/dominator.html>.
-
-
-
-
-Jadhav, et al.            Expires June 4, 2017                  [Page 7]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
-
 
    [I-D.narten-iana-considerations-rfc2434bis]
               Narten, T. and H. Alvestrand, "Guidelines for Writing an
@@ -417,6 +494,18 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
               DOI 10.17487/RFC6550, March 2012,
               <http://www.rfc-editor.org/info/rfc6550>.
 
+
+
+
+
+
+
+
+Jadhav, et al.            Expires June 4, 2017                  [Page 9]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
    [RFC6775]  Shelby, Z., Ed., Chakrabarti, S., Nordmark, E., and C.
               Bormann, "Neighbor Discovery Optimization for IPv6 over
               Low-Power Wireless Personal Area Networks (6LoWPANs)",
@@ -435,19 +524,6 @@ Authors' Addresses
    India
 
    Email: rahul.ietf@gmail.com
-
-
-
-
-
-
-
-
-
-
-Jadhav, et al.            Expires June 4, 2017                  [Page 8]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
    Rabi Narayan Sahoo
@@ -481,24 +557,4 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Jadhav, et al.            Expires June 4, 2017                  [Page 9]
+Jadhav, et al.            Expires June 4, 2017                 [Page 10]

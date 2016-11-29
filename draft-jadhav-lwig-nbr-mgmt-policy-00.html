@@ -407,8 +407,8 @@
   <meta name="dct.creator" content="Jadhav, R., Ed., Sahoo, R., Duquennoy, S., and J. Eriksson" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-jadhav-lwig-nbr-mgmt-policy-00" />
   <meta name="dct.issued" scheme="ISO8601" content="2016-12" />
-  <meta name="dct.abstract" content="This document describes the problems associated with neighbor management in multihop networks and a sample neighbor management policy to deal with it. With increase in node density, an efficient neighbor management policy helps to achieve stability in the network." />
-  <meta name="description" content="This document describes the problems associated with neighbor management in multihop networks and a sample neighbor management policy to deal with it. With increase in node density, an efficient neighbor management policy helps to achieve stability in the network." />
+  <meta name="dct.abstract" content="This document describes the problems associated with neighbor management in constrained multihop networks and a sample neighbor management policy to deal with it." />
+  <meta name="description" content="This document describes the problems associated with neighbor management in constrained multihop networks and a sample neighbor management policy to deal with it." />
 
 </head>
 
@@ -456,7 +456,7 @@
   <h1 id="rfc.abstract">
   <a href="#rfc.abstract">Abstract</a>
 </h1>
-<p>This document describes the problems associated with neighbor management in multihop networks and a sample neighbor management policy to deal with it. With increase in node density, an efficient neighbor management policy helps to achieve stability in the network.</p>
+<p>This document describes the problems associated with neighbor management in constrained multihop networks and a sample neighbor management policy to deal with it.</p>
 <h1 id="rfc.status">
   <a href="#rfc.status">Status of This Memo</a>
 </h1>
@@ -506,8 +506,9 @@
 
   <h1 id="rfc.section.1"><a href="#rfc.section.1">1.</a> Introduction</h1>
 <p id="rfc.section.1.p.1">In a wireless multihop network, the node densities may vary significantly depending upon deployments/scenarios. While there is some policy control possible with regards to the network size in terms of maximum number of devices connected, it is especially difficult to set a figure on what will be the maximum node density given a deployment. For e.g. A network can put an upper limit on  max 1000 devices but it is impossible to state what the node density will be in this 1000 node network. Node density refers to maximum number of devices connected on a single link. </p>
-<p id="rfc.section.1.p.2">A neighbor cache is usually used for populating neighboring one-hop connected nodes information such as MAC address, link local IP address and other state information. Node density has direct implications on the neighbor cache and in constrained network scenario the size of the neighbor cache will be limited. Thus there are chances that a node may not be able to fit all the neighboring nodes in its table cache in which case it has to prioritize entries and thus needs a neighbor management policy.</p>
-<p id="rfc.section.1.p.3">In this draft, we present problems related to neighbor management policies by considering a security-enabled multi-hop 6lo network. We specifically consider RPL<a href="#RFC6550">[RFC6550]</a> as a routing protocol and PANA(EAP-PANA)<a href="#RFC5191">[RFC5191]</a> as a network access protocol. For RPL, both the storing and non-storing mode of operations are considered.  We also provide a sample neighbor management policy which can be used in such networks with its limitations/assumptions.</p>
+<p id="rfc.section.1.p.2">Every networked node needs to manage the neighbor entries for resolving MAC addresses. Linux and other operating systems have used neighbor management policies which essentially are first-come, first-serve basis. In case of Linux, the kernel issues a warning when the neighbor table overflows in which case the usual step taken is to tune the negighbor cache size. With constrained nodes, this solution does not help.</p>
+<p id="rfc.section.1.p.3">A neighbor cache is usually used for populating neighboring one-hop connected nodes information such as MAC address, link local IP address and other state information. Node density has direct implications on the neighbor cache and in constrained network scenario the size of the neighbor cache will be limited. Thus there are chances that a node may not be able to fit all the neighboring nodes in its table cache in which case it has to prioritize entries and thus needs a neighbor management policy.</p>
+<p id="rfc.section.1.p.4">In this draft, we present problems related to neighbor management policies by considering a security-enabled multi-hop 6lo network. We specifically consider RPL<a href="#RFC6550">[RFC6550]</a> as a routing protocol and PANA(EAP-PANA)<a href="#RFC5191">[RFC5191]</a> as a network access protocol. For RPL, both the storing and non-storing mode of operations are considered. We also provide a sample neighbor management policy which can be used in such networks with its limitations and assumptions.</p>
 <div id="rfc.figure.1"/>
 <div id="sample_top"/>
 <pre>
@@ -539,25 +540,26 @@
 |        6Lo Network       |
 +--------------------------+ 
             </pre>
-<p id="rfc.section.1.p.4">For the rest of this document consider the following topology: </p>
+<p id="rfc.section.1.p.5">For the rest of this document consider the following topology: </p>
 
-<p>Sample Topology (subject to change) </p>
+<p>Sample Topology</p>
 <p class="figure">Figure 1</p>
 <h1 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a> Requirements Language and Terminology</h1>
 <p id="rfc.section.1.1.p.1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <a href="#RFC2119">RFC 2119</a> <cite title="NONE">[RFC2119]</cite>.</p>
-<p id="rfc.section.1.1.p.2">PaC: PANA Client</p>
-<p id="rfc.section.1.1.p.3">PRE: PANA Relay Element</p>
-<p id="rfc.section.1.1.p.4">PAA: PANA Auth Agent</p>
-<p id="rfc.section.1.1.p.5">Routing Direct Child: </p>
-<p id="rfc.section.1.1.p.6">Routing Parent: </p>
-<p id="rfc.section.1.1.p.7">Neighbor Cache Entry (NCE) </p>
-<p id="rfc.section.1.1.p.8">This document also uses terminology described in <a href="#RFC6550">[RFC6550]</a>.</p>
+<p id="rfc.section.1.1.p.2">PaC: PANA Client. New joining node which is yet to be authenticated.</p>
+<p id="rfc.section.1.1.p.3">PRE: PANA Relay Element. An already authenticated and network joined node which acts as a relay element for PaCs.</p>
+<p id="rfc.section.1.1.p.4">PAA: PANA Auth Agent. Auth server which hosts the credentials database. PaC will handshake with PAA to complete authentication procedure.</p>
+<p id="rfc.section.1.1.p.5">Routing Direct Child: A directly connected node who is part of the routing table of the parent. For e.g. in the sample topology above N5 is the routing direct child for N3. Even though N6 and N7 may also be part of N3 routing table, they are not considered to be routing direct childs since they are not on the same hop.</p>
+<p id="rfc.section.1.1.p.6">Routing Parent: In the sample topology (<a href="#sample_top">Figure 1</a>), N1 and N2 are possible routing parents for N3.</p>
+<p id="rfc.section.1.1.p.7">Neighbor Cache Entry (NCE): A neighbor entry managed on behalf of directly connected peer.</p>
+<p id="rfc.section.1.1.p.8">This document also uses terminology described in <a href="#RFC6550">[RFC6550]</a> and <a href="#RFC6775">[RFC6775]</a>.</p>
 <h1 id="rfc.section.2"><a href="#rfc.section.2">2.</a> <a href="#nbr_mgmt" id="nbr_mgmt">Neighbor Management</a></h1>
 <h1 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a> Significance of Neighbor management policy</h1>
-<p id="rfc.section.2.1.p.1">Multihop mesh networks present unique challenges to neighbor management especially with resource constrained nodes. In class A devices for e.g. telos motes maximum x nodes can be provisioned as neighbors.</p>
-<p id="rfc.section.2.1.p.2">In case of key management protocols deployed above MAC layer in multihop network, the neighbor management kicks in early even before the routing adjacencies are established. Since a new joining node needs to discover/attach to a relay element for completing its authentication procedure, the neighbor table entries have to be appropriately populated both on a PaC and on the PRE. </p>
-<p id="rfc.section.2.1.p.3">Link estimation alone won't help since in dense deployments the number of directly attached neighbors with good quality links might still be higher than the max entries in nbr cache.</p>
+<p id="rfc.section.2.1.p.1">Multihop mesh networks present unique challenges to neighbor management especially with resource constrained nodes. In cases where the node density is higher that the neighbor cache size, the entries have to be prioritized. <a href="#woo_et_al">[woo_et_al]</a> and <a href="#Dawans_et_al">[Dawans_et_al]</a> talk about prioritization of neighbor entries by using link quality estimation techniques. But prioritization alone may not necessarily be optimal in all cases. The reason or function why neighbor entry was added also needs to be taken in consideration. For example, evicting a routing direct child might have a ripple effect in turn impacting all the sub-childs as well.</p>
+<p id="rfc.section.2.1.p.2">In case of key management protocols deployed above MAC layer in multihop network, the neighbor management kicks in early even before the routing adjacencies are established. Since a new joining node needs to discover/attach to a relay element for completing its authentication procedure, the neighbor table entries have to be appropriately populated both on a PaC and on the PRE. If a neighbor entry whose authentication is in progress is evicted, it may increase the authentication time drastically.</p>
+<p id="rfc.section.2.1.p.3">Another important consideration is that with increased node density, the prioritization based on link estimation parameters might not help since there might be more number of well connected peers. In dense deployments the number of directly attached neighbors with good quality links might still be higher than the max entries in neighbor cache size.</p>
 <h1 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a> Trivial neighbor management policies</h1>
+<p id="rfc.section.2.2.p.1">Every networked node needs to be manage the neighbor entries for resolving MAC addresses. Linux and other operating systems have used neighbor management policies which essentially are first-come, first-serve basis. In case of Linux, the kernel issues a warning when the neighbor table overflows in which case the usual step taken is to tune the negighbor cache size. With constrained nodes, this solution does not help.</p>
 <p/>
 
 <ol>
@@ -632,6 +634,12 @@
 <h1 id="rfc.references.1"><a href="#rfc.references.1">7.1.</a> Normative References</h1>
 <table>
   <tbody>
+    <tr>
+      <td class="reference">
+        <b id="Dawans_et_al">[Dawans_et_al]</b>
+      </td>
+      <td class="top"><a title="CETIC">Dawans, Sebastien.</a>, <a title="SICS">Duquennoy, Simon.</a> and <a title="Universite Catholique de Louvain">Olivier. Bonaventure</a>, "<a>On Link Estimation in Dense RPL Deployments</a>", 2012.</td>
+    </tr>
     <tr>
       <td class="reference">
         <b id="RFC2119">[RFC2119]</b>

@@ -153,6 +153,14 @@
    be in this 1000 node network. Node density refers to maximum number
    of devices connected on a single link. </t>
 
+   <t>Every networked node needs to manage the neighbor entries for 
+   resolving MAC addresses. Linux and other operating systems have used 
+   neighbor management policies which essentially are first-come, 
+   first-serve basis. In case of Linux, the kernel issues a warning 
+   when the neighbor table overflows in which case the usual step taken 
+   is to tune the negighbor cache size. With constrained nodes, this 
+   solution does not help.</t>
+   
    <t>A neighbor cache is usually used for populating neighboring
    one-hop connected nodes information such as MAC address, link local
    IP address and other state information. Node density has direct
@@ -164,11 +172,12 @@
 
    <t>In this draft, we present problems related to neighbor management
    policies by considering a security-enabled multi-hop 6lo 
-   network. We specifically consider RPL<xref target="RFC6550"></xref> as a routing protocol
-   and PANA(EAP-PANA)<xref target="RFC5191"></xref> as a network access protocol. For RPL,
-   both the storing and non-storing mode of operations are considered.
-   We also provide a sample neighbor management policy which can be used
-   in such networks with its limitations/assumptions.</t>
+   network. We specifically consider RPL<xref target="RFC6550"></xref> 
+   as a routing protocol and PANA(EAP-PANA)<xref target="RFC5191"></xref> 
+   as a network access protocol. For RPL, both the storing and non-storing 
+   mode of operations are considered. We also provide a sample neighbor 
+   management policy which can be used in such networks with its 
+   limitations and assumptions.</t>
 
    <t>For the rest of this document consider the following topology:
    <figure align="center" anchor="sample_top">
@@ -233,6 +242,7 @@
             <t>Another important consideration is that with increased node density, the prioritization based on link estimation parameters might not help since there might be more number of well connected peers. In dense deployments the number of directly attached neighbors with good quality links might still be higher than the max entries in neighbor cache size.</t>
         </section>
         <section title="Trivial neighbor management policies">
+            <t>Every networked node needs to be manage the neighbor entries for resolving MAC addresses. Linux and other operating systems have used neighbor management policies which essentially are first-come, first-serve basis. In case of Linux, the kernel issues a warning when the neighbor table overflows in which case the usual step taken is to tune the negighbor cache size. With constrained nodes, this solution does not help.</t>
             <t><list style="numbers">
             <t>FCFS policy</t>
             <t>LRU policy</t>
