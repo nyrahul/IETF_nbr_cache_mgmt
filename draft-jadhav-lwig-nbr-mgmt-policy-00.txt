@@ -5,10 +5,11 @@
 LWIG                                                      R. Jadhav, Ed.
 Internet-Draft                                                  R. Sahoo
 Intended status: Informational                               Huawei Tech
-Expires: June 4, 2017                                       S. Duquennoy
+Expires: June 9, 2017                                       S. Duquennoy
+                                                                   Inria
                                                              J. Eriksson
                                                                     SICS
-                                                           December 2016
+                                                        December 6, 2016
 
 
                  Neighbor Management Policy for 6LoWPAN
@@ -35,7 +36,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on June 4, 2017.
+   This Internet-Draft will expire on June 9, 2017.
 
 Copyright Notice
 
@@ -52,8 +53,7 @@ Copyright Notice
 
 
 
-
-Jadhav, et al.            Expires June 4, 2017                  [Page 1]
+Jadhav, et al.            Expires June 9, 2017                  [Page 1]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -91,15 +91,15 @@ Table of Contents
 
 1.  Introduction
 
-   In a wireless multihop network, the node densities may vary
-   significantly depending upon deployments/scenarios.  While there is
-   some policy control possible with regards to the network size in
-   terms of maximum number of devices connected, it is especially
-   difficult to set a figure on what will be the maximum node density
-   given a deployment.  For e.g.  A network can put an upper limit on
-   max 1000 devices but it is impossible to state what the node density
-   will be in this 1000 node network.  Node density refers to maximum
-   number of devices connected on a single link.
+   In a wireless multihop network, the node densities (maximum number
+   devices connected on a single link) may vary significantly depending
+   upon deployments/scenarios.  While there is some policy control
+   possible with regards to the network size in terms of maximum number
+   of devices connected, it is especially difficult to set a figure on
+   what will be the maximum node density given a deployment.  For e.g.
+   A network can put an upper limit on max 1000 devices but it is
+   impossible to state what the node density will be in this 1000 node
+   network.
 
    Every networked node needs to manage the neighbor entries for
    resolving MAC addresses.  Linux and other operating systems have used
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Jadhav, et al.            Expires June 4, 2017                  [Page 2]
+Jadhav, et al.            Expires June 9, 2017                  [Page 2]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -128,11 +128,11 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
    In this draft, we present problems related to neighbor management
    policies by considering a security-enabled multi-hop 6lo network.  We
-   specifically consider RPL[RFC6550] as a routing protocol and
-   PANA(EAP-PANA)[RFC5191] as a network access protocol.  For RPL, both
-   the storing and non-storing mode of operations are considered.  We
-   also provide a sample neighbor management policy which can be used in
-   such networks with its limitations and assumptions.
+   specifically consider RPL[RFC6550] as a routing protocol and PANA
+   (EAP-PANA)[RFC5191] as a network access protocol.  For RPL, both the
+   storing and non-storing mode of operations are considered.  We also
+   provide a sample neighbor management policy which can be used in such
+   networks with its limitations and assumptions.
 
    For the rest of this document consider the following topology:
 
@@ -165,7 +165,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-Jadhav, et al.            Expires June 4, 2017                  [Page 3]
+Jadhav, et al.            Expires June 9, 2017                  [Page 3]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -221,7 +221,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-Jadhav, et al.            Expires June 4, 2017                  [Page 4]
+Jadhav, et al.            Expires June 9, 2017                  [Page 4]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -248,7 +248,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
    Multihop mesh networks present unique challenges to neighbor
    management especially with resource constrained nodes.  In cases
    where the node density is higher that the neighbor cache size, the
-   entries have to be prioritized. [woo_et_al] and [Dawans_et_al] talk
+   entries have to be prioritized.  [Woo_et_al] and [Dawans_et_al] talk
    about prioritization of neighbor entries by using link quality
    estimation techniques.  But prioritization alone may not necessarily
    be optimal in all cases.  The reason or function why neighbor entry
@@ -267,24 +267,24 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
    Another important consideration is that with increased node density,
    the prioritization based on link estimation parameters might not help
-   since there might be more number of well connected peers.  In dense
-   deployments the number of directly attached neighbors with good
-   quality links might still be higher than the max entries in neighbor
-   cache size.
+   since there might be more well connected peers.  In dense deployments
+   the number of directly attached neighbors with good quality links
+   might still be higher than the max entries in neighbor cache size.
 
 
 
 
 
 
-Jadhav, et al.            Expires June 4, 2017                  [Page 5]
+
+Jadhav, et al.            Expires June 9, 2017                  [Page 5]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 2.2.  Trivial neighbor management policies
 
-   Every networked node needs to be manage the neighbor entries for
+   Every networked node needs to manage the neighbor entries for
    resolving MAC addresses.  Linux and other operating systems have used
    neighbor management policies which essentially are first-come, first-
    serve basis.  In case of Linux, the kernel issues a warning when the
@@ -333,7 +333,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-Jadhav, et al.            Expires June 4, 2017                  [Page 6]
+Jadhav, et al.            Expires June 9, 2017                  [Page 6]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -365,8 +365,8 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 3.  Reservation based Neighbor Management Policy
 
-   Reservation for direct childs and pre-auth entries.  Parent nodes can
-   still occupy the reserved entries since they could be evicted if
+   Reservation for direct children and pre-auth entries.  Parent nodes
+   can still occupy the reserved entries since they could be evicted if
    necessary.  Describe the actual policy here.
 
      <- - - - - - - - - - - Routing Parents - - - - - - - - - - - - ->
@@ -389,7 +389,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-Jadhav, et al.            Expires June 4, 2017                  [Page 7]
+Jadhav, et al.            Expires June 9, 2017                  [Page 7]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -439,31 +439,26 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 7.1.  Normative References
 
+   [Dawans_et_al]
+              Dawans, S., Duquennoy, S., and O. Bonaventure, "On Link
+              Estimation in Dense RPL Deployments", 2012.
 
 
 
-
-
-
-Jadhav, et al.            Expires June 4, 2017                  [Page 8]
+Jadhav, et al.            Expires June 9, 2017                  [Page 8]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
-
-   [Dawans_et_al]
-              Dawans, Sebastien., Duquennoy, Simon., and Olivier.
-              Bonaventure, "On Link Estimation in Dense RPL
-              Deployments", 2012.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
-   [woo_et_al]
-              Woo, Alec., Tong, Terence., and David. Culler, "Taming the
-              Underlying Challenges of Reliable Multihop Routing in
-              Sensor Networks", 2003.
+   [Woo_et_al]
+              Woo, A., Tong, T., and D. Culler, "Taming the Underlying
+              Challenges of Reliable Multihop Routing in Sensor
+              Networks", 2003.
 
 7.2.  Informative References
 
@@ -494,23 +489,22 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
               DOI 10.17487/RFC6550, March 2012,
               <http://www.rfc-editor.org/info/rfc6550>.
 
-
-
-
-
-
-
-
-Jadhav, et al.            Expires June 4, 2017                  [Page 9]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
-
-
    [RFC6775]  Shelby, Z., Ed., Chakrabarti, S., Nordmark, E., and C.
               Bormann, "Neighbor Discovery Optimization for IPv6 over
               Low-Power Wireless Personal Area Networks (6LoWPANs)",
               RFC 6775, DOI 10.17487/RFC6775, November 2012,
               <http://www.rfc-editor.org/info/rfc6775>.
+
+
+
+
+
+
+
+Jadhav, et al.            Expires June 9, 2017                  [Page 9]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
 
 Appendix A.  Additional Stuff
 
@@ -535,10 +529,13 @@ Authors' Addresses
 
 
    Simon Duquennoy
-   SICS
-   TODO
-   TODO
+   Inria
+   40 Avenue Halley
+   Building A
+   Villeneuve d'Ascq
+   France
 
+   Phone: +33 768227731
    Email: simon.duquennoy@inria.fr
 
 
@@ -557,4 +554,7 @@ Authors' Addresses
 
 
 
-Jadhav, et al.            Expires June 4, 2017                 [Page 10]
+
+
+
+Jadhav, et al.            Expires June 9, 2017                 [Page 10]

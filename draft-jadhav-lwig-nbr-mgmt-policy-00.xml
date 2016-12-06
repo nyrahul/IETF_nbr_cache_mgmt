@@ -142,15 +142,15 @@
 
   <middle>
     <section title="Introduction">
-      <t> In a wireless multihop network, the node densities may vary
+      <t> In a wireless multihop network, the node densities (maximum
+   number devices connected on a single link) may vary
    significantly depending upon deployments/scenarios. While there is
    some policy control possible with regards to the network size in
    terms of maximum number of devices connected, it is especially
    difficult to set a figure on what will be the maximum node density
    given a deployment. For e.g. A network can put an upper limit on  max
    1000 devices but it is impossible to state what the node density will
-   be in this 1000 node network. Node density refers to maximum number
-   of devices connected on a single link. </t>
+   be in this 1000 node network. </t>
 
    <t>Every networked node needs to manage the neighbor entries for 
    resolving MAC addresses. Linux and other operating systems have used 
@@ -159,6 +159,8 @@
    when the neighbor table overflows in which case the usual step taken 
    is to tune the negighbor cache size. With constrained nodes, this 
    solution does not help.</t>
+     <!-- SD: Does Linux really has the same problem? Doesn't dynamic
+     memory allocation basically solve everything? -->
    
    <t>A neighbor cache is usually used for populating neighboring
    one-hop connected nodes information such as MAC address, link local
@@ -172,7 +174,7 @@
    <t>In this draft, we present problems related to neighbor management
    policies by considering a security-enabled multi-hop 6lo 
    network. We specifically consider RPL<xref target="RFC6550"></xref> 
-   as a routing protocol and PANA(EAP-PANA)<xref target="RFC5191"></xref> 
+   as a routing protocol and PANA (EAP-PANA)<xref target="RFC5191"></xref> 
    as a network access protocol. For RPL, both the storing and non-storing 
    mode of operations are considered. We also provide a sample neighbor 
    management policy which can be used in such networks with its 
@@ -225,6 +227,8 @@
             <t>PRE: PANA Relay Element. An already authenticated and network joined node which acts as a relay element for PaCs.</t>
             <t>PAA: PANA Auth Agent. Auth server which hosts the credentials database. PaC will handshake with PAA to complete authentication procedure.</t>
             <t>Routing Direct Child: A directly connected node who is part of the routing table of the parent. For e.g. in the sample topology above N5 is the routing direct child for N3. Even though N6 and N7 may also be part of N3 routing table, they are not considered to be routing direct childs since they are not on the same hop.</t>
+            <!-- SD: As the child-parent relation is symmetrical, I suggest to either (1) use "direct" for both or (2) not use "direct" at all.
+            I would simply use "Routing Child", and make clear in the text we're referring only about direct children, i.e. next hops in the the routing table. -->
             <t>Routing Parent: In the sample topology (<xref target="sample_top"/>), N1 and N2 are possible routing parents for N3.</t>
             <t>Neighbor Cache Entry (NCE): A neighbor entry managed on behalf of directly connected peer.</t>
             <t>This document also uses terminology described in <xref target="RFC6550"></xref> and <xref target="RFC6775"></xref>.</t>
@@ -234,14 +238,16 @@
 
     <section anchor="nbr_mgmt" title="Neighbor Management">
         <section title="Significance of Neighbor management policy">
-            <t>Multihop mesh networks present unique challenges to neighbor management especially with resource constrained nodes. In cases where the node density is higher that the neighbor cache size, the entries have to be prioritized. <xref target="woo_et_al"/> and <xref target="Dawans_et_al"/> talk about prioritization of neighbor entries by using link quality estimation techniques. But prioritization alone may not necessarily be optimal in all cases. The reason or function why neighbor entry was added also needs to be taken in consideration. For example, evicting a routing direct child might have a ripple effect in turn impacting all the sub-childs as well.</t>
+            <t>Multihop mesh networks present unique challenges to neighbor management especially with resource constrained nodes. In cases where the node density is higher that the neighbor cache size, the entries have to be prioritized. <xref target="Woo_et_al"/> and <xref target="Dawans_et_al"/> talk about prioritization of neighbor entries by using link quality estimation techniques. But prioritization alone may not necessarily be optimal in all cases. The reason or function why neighbor entry was added also needs to be taken in consideration. For example, evicting a routing direct child might have a ripple effect in turn impacting all the sub-childs as well.</t>
 
-            <t>In case of key management protocols deployed above MAC layer in multihop network, the neighbor management kicks in early even before the routing adjacencies are established. Since a new joining node needs to discover/attach to a relay element for completing its authentication procedure, the neighbor table entries have to be appropriately populated both on a PaC and on the PRE. If a neighbor entry whose authentication is in progress is evicted, it may increase the authentication time drastically.</t>
+            <t>In case of key management protocols deployed above MAC layer in multihop network, the neighbor management kicks in early even before the routing adjacencies are established. Since a new joining node needs to discover/attach to a relay element for completing its authentication procedure, the neighbor table entries
+<!-- SD: consistency: do we make any difference between "neighbor table" and "neighbor cache"? -->
+            have to be appropriately populated both on a PaC and on the PRE. If a neighbor entry whose authentication is in progress is evicted, it may increase the authentication time drastically.</t>
 
-            <t>Another important consideration is that with increased node density, the prioritization based on link estimation parameters might not help since there might be more number of well connected peers. In dense deployments the number of directly attached neighbors with good quality links might still be higher than the max entries in neighbor cache size.</t>
+            <t>Another important consideration is that with increased node density, the prioritization based on link estimation parameters might not help since there might be more well connected peers. In dense deployments the number of directly attached neighbors with good quality links might still be higher than the max entries in neighbor cache size.</t>
         </section>
         <section title="Trivial neighbor management policies">
-            <t>Every networked node needs to be manage the neighbor entries for resolving MAC addresses. Linux and other operating systems have used neighbor management policies which essentially are first-come, first-serve basis. In case of Linux, the kernel issues a warning when the neighbor table overflows in which case the usual step taken is to tune the negighbor cache size. With constrained nodes, this solution does not help.</t>
+            <t>Every networked node needs to manage the neighbor entries for resolving MAC addresses. Linux and other operating systems have used neighbor management policies which essentially are first-come, first-serve basis. In case of Linux, the kernel issues a warning when the neighbor table overflows in which case the usual step taken is to tune the negighbor cache size. With constrained nodes, this solution does not help.</t>
             <t><list style="numbers">
             <t>FCFS policy</t>
             <t>LRU policy</t>
@@ -266,9 +272,11 @@
                 <t>talk about how to maintain entry freshness, estimation parameters etc</t>
                 <t>Sample mechanism employed by Contiki for link estimation and reinforcement.</t>
                 <t>Role of link estimation techniques to prioritize.</t>
+                <!-- SD: To what extent do we want to define probing? Do we only recommend, with one practical example? Or do we want to mandate? -->
             </section>
         </section>
         <section title="Approaches to neighbor management policy">
+        <!-- SD: I like the idea to address both proactive and reactive. For proactive, do we plan to advertise the space left in NCE as a DIO metric or similar? -->
             <section title="Proactive Approach">
                 <t>Is it possible for the child nodes to select parents according to their space availability? In this case, parents need to advertise the free space availability. This is a complex scheme ...blah blah </t>
             </section>
@@ -278,7 +286,7 @@
         </section>
         <section title="Requirements of a good neighbor management policy">
             <t><list style="letters">
-                <t>Easy to implement</t>
+                <t>Easy to implement</t><!-- SD: I don't think "easy to implement" should be a priority here -->
                 <t>Less control overhead</t>
                 <t>stability of paths, deterministic routes</t>
                 <t>blah</t>
@@ -286,7 +294,12 @@
         </section>
     </section>
     <section title="Reservation based Neighbor Management Policy">
-        <t>Reservation for direct childs and pre-auth entries. Parent nodes can still occupy the reserved entries since they could be evicted if necessary.
+        <!-- SD: we need to define here how we know our children in RPL non-storing.
+        If needed, we could enforce a way to use 6lowpan-nd in non-storing context.
+        E.g. force NS before switch, so we provision our entry at the future parent before switching.
+        Also, with 6lowpan-nd, my understanding is that not only children and parent end up in the table.
+        How shall we handle other nodes present in the cache, how to we identify children? -->
+        <t>Reservation for direct children and pre-auth entries. Parent nodes can still occupy the reserved entries since they could be evicted if necessary.
         Describe the actual policy here.</t>
         <t><figure align="center" anchor="reserv_table">
         <!-- <preamble>Preamble text - can be omitted or empty.</preamble> -->
@@ -369,18 +382,18 @@
       <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
       &RFC2119;
 
-        <reference anchor="woo_et_al">
+        <reference anchor="Woo_et_al">
         <!-- the following is the minimum to make xml2rfc happy -->
 
             <front>
                 <title>Taming the Underlying Challenges of Reliable Multihop Routing in Sensor Networks</title>
-                <author initials="Alec" surname="Woo">
+                <author initials="A" surname="Woo">
                     <organization>University of California</organization>
                 </author>
-                <author initials="Terence" surname="Tong">
+                <author initials="T" surname="Tong">
                     <organization>University of California</organization>
                 </author>
-                <author initials="David" surname="Culler">
+                <author initials="D" surname="Culler">
                     <organization>Intel Corp</organization>
                 </author>
                 <date year="2003" />
@@ -391,13 +404,13 @@
 
             <front>
                 <title>On Link Estimation in Dense RPL Deployments</title>
-                <author initials="Sebastien" surname="Dawans">
+                <author initials="S" surname="Dawans">
                     <organization>CETIC</organization>
                 </author>
-                <author initials="Simon" surname="Duquennoy">
+                <author initials="S" surname="Duquennoy">
                     <organization>SICS</organization>
                 </author>
-                <author initials="Olivier" surname="Bonaventure">
+                <author initials="O" surname="Bonaventure">
                     <organization>Universite Catholique de Louvain</organization>
                 </author>
                 <date year="2012" />
