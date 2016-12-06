@@ -80,17 +80,16 @@
         <email>rabinarayan@huawei.com</email>
       </address>
     </author>
-    <author fullname="Simon Duquennoy" initials="S.D." surname="Duquennoy">
-      <organization>SICS</organization>
+    <author initials="S" surname="Duquennoy" fullname="Simon Duquennoy" role="editor">
+      <organization>Inria</organization>
       <address>
         <postal>
-          <street></street>
-          <city>TODO</city>
-          <region></region>
-          <code></code>
-          <country>TODO</country>
+          <street>40 Avenue Halley</street>
+          <street>Building A</street>
+          <city>Villeneuve d'Ascq</city>
+          <country>France</country>
         </postal>
-        <phone></phone>
+        <phone>+33 768227731</phone>
         <email>simon.duquennoy@inria.fr</email>
       </address>
     </author>
