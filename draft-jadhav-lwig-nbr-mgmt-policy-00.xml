@@ -56,13 +56,13 @@
       <organization>Huawei Tech</organization>
       <address>
         <postal>
-          <street></street>
+          <street>Kundalahalli Village, Whitefield,</street>
           <city>Bangalore</city>
-          <region></region>
+          <region>Karnataka</region>
           <code>560037</code>
           <country>India</country>
         </postal>
-        <phone></phone>
+        <phone>+91-080-49160700</phone>
         <email>rahul.ietf@gmail.com</email>
       </address>
     </author>
@@ -70,13 +70,13 @@
       <organization>Huawei Tech</organization>
       <address>
         <postal>
-          <street></street>
+          <street>Kundalahalli Village, Whitefield, </street>
           <city>Bangalore</city>
-          <region></region>
+          <region>Karnataka</region>
           <code>560037</code>
           <country>India</country>
         </postal>
-        <phone></phone>
+        <phone>+91-080-49160700</phone>
         <email>rabinarayan@huawei.com</email>
       </address>
     </author>
@@ -136,49 +136,52 @@
          keywords will be used for the search engine. -->
 
     <abstract>
-      <t>This document describes the problems associated with neighbor management in constrained multihop networks and a sample neighbor management policy to deal with it.</t>
+	  <t>This document describes the problems associated with neighbor
+	  management in constrained multihop networks and a sample neighbor
+	  management policy to deal with it.</t>
     </abstract>
   </front>
 
-  <middle>
-    <section title="Introduction">
-	  <t> In a wireless multihop network, the node densities (maximum
-   number devices connected on a single link) may vary significantly depending
-   upon deployments/scenarios. While there is some policy control possible with
-   regards to the network size in terms of maximum number of devices connected,
-   it is especially difficult to set a figure on what will be the maximum node
-   density given a deployment. For e.g. A network can put an upper limit on
-   max 1000 devices but it is impossible to state what the node density will be
-   in this 1000 node network. </t>
+<middle>
+	<section title="Introduction">
+		<t> In a wireless multihop network, the node densities (maximum number
+		devices connected on a single link) may vary significantly depending
+		upon deployments/scenarios. While there is some policy control possible
+		with regards to the network size in terms of maximum number of devices
+		connected, it is especially difficult to set a figure on what will be
+		the maximum node density given a deployment.  For e.g. A network can
+		put an upper limit on max 1000 devices but it is impossible to state
+		what the node density will be in this 1000 node network. </t>
 
-   <t>Every networked node needs to manage the neighbor entries for resolving
-   MAC addresses. Linux and other operating systems have used neighbor
-   management policies which essentially are first-come, first-serve basis. In
-   case of Linux, the kernel issues a warning when the neighbor table overflows
-   in which case the usual step taken is to tune the negighbor cache size. With
-   constrained nodes, this solution does not help.</t> <!-- SD: Does Linux
-   really has the same problem? Doesn't dynamic memory allocation basically
-   solve everything? -->
+	   <t>Every networked node needs to manage the neighbor entries for
+	   resolving MAC addresses. Linux and other operating systems have used
+	   neighbor management policies which essentially are first-come,
+	   first-serve basis. In case of Linux, the kernel issues a warning when
+	   the neighbor table overflows in which case the usual step taken is to
+	   tune the negighbor cache size. With constrained nodes, this solution
+	   does not help.</t> <!-- SD: Does Linux really has the same problem?
+	   Doesn't dynamic memory allocation basically solve everything? -->
    
-   <t>A neighbor cache is usually used for populating neighboring one-hop
-   connected nodes information such as MAC address, link local IP address and
-   other state information. Node density has direct implications on the
-   neighbor cache and in constrained network scenario the size of the neighbor
-   cache will be limited. Thus there are chances that a node may not be able to
-   fit all the neighboring nodes in its table cache in which case it has to
-   prioritize entries and thus needs a neighbor management policy.</t>
+		<t>A neighbor cache is usually used for populating neighboring one-hop
+		connected nodes information such as MAC address, link local IP address
+		and other state information. Node density has direct implications on
+		the neighbor cache and in constrained network scenario the size of the
+		neighbor cache will be limited. Thus there are chances that a node may
+		not be able to fit all the neighboring nodes in its table cache in
+		which case it has to prioritize entries and thus needs a neighbor
+		management policy.</t>
 
-   <t>In this draft, we present problems related to neighbor management
-   policies by considering a security-enabled multi-hop 6lo network. We
-   specifically consider RPL<xref target="RFC6550"></xref> as a routing
-   protocol and PANA (EAP-PANA)<xref target="RFC5191"></xref> as a network
-   access protocol. For RPL, both the storing and non-storing mode of
-   operations are considered. We also provide a sample neighbor management
-   policy which can be used in such networks with its limitations and
-   assumptions.</t>
+		<t>In this draft, we present problems related to neighbor management
+		policies by considering a security-enabled multi-hop 6lo network. We
+		specifically consider RPL<xref target="RFC6550"/> as a routing protocol
+		and PANA (EAP-PANA)<xref target="RFC5191"/> as a network access
+		protocol. For RPL, both the storing and non-storing mode of operations
+		are considered. We also provide a sample neighbor management policy
+		which can be used in such networks with its limitations and
+		assumptions.</t>
 
-   <t>For the rest of this document consider the following topology:
-   <figure align="center" anchor="sample_top">
+		<t>For the rest of this document consider the following topology:
+		<figure align="center" anchor="sample_top">
         <!-- <preamble>Preamble text - can be omitted or empty.</preamble> -->
 
         <artwork align="center"><![CDATA[
@@ -232,17 +235,19 @@
 			the directly connected routing child for N3.  N6 and N7 are also
 			part of N3 routing table, they are routing child nodes but not
 			directly connected. For N6 and N7 the document might alternatively
-			use a term grand-child.</t> <!-- SD: As the child-parent relation
-			is symmetrical, I suggest to either (1) use "direct" for both or
-			(2) not use "direct" at all.  I would simply use "Routing Child",
-			and make clear in the text we're referring only about direct
-			children, i.e. next hops in the the routing table. --> <t>Routing
-			Parent: In the sample topology (<xref target="sample_top"/>), N1
-			and N2 are possible routing parents for N3.</t>
+			use a term grand-child.</t> 
+			<!-- SD: As the child-parent relation is symmetrical, I suggest to
+			either (1) use "direct" for both or (2) not use "direct" at all.  I
+			would simply use "Routing Child", and make clear in the text we're
+			referring only about direct children, i.e. next hops in the the
+			routing table. --> 
+			<t>Routing Parent: In the sample topology (<xref
+			target="sample_top"/>), N1 and N2 are possible routing parents for
+			N3.</t>
 			<t>Neighbor Cache Entry (NCE): A neighbor entry managed on behalf
 			of directly connected peer.</t>
 			<t>This document also uses terminology described in <xref
-			target="RFC6550"></xref> and <xref target="RFC6775"></xref>.</t>
+			target="RFC6550"/> and <xref target="RFC6775"/>.</t>
         </section>
       
     </section>
@@ -276,25 +281,23 @@
 			might not help since there might be more well connected peers. In
 			dense deployments the number of directly attached neighbors with
 			good quality links might still be higher than the max entries in
-			neighbor cache size.</t>
-        </section>
-        <section title="Trivial neighbor management policies">
+			neighbor cache size.</t> 
+		</section> 
+		<section title="Trivial neighbor management policies"> 
 			<t>This section investigates policies which are used by most of the
 			current operating systems for constrained nodes. While such
-			policies are trivial to implement they may not be able to deal
-			with the constrained network scenario. Note that such policies can
-			still be utilized or deployed if it is known apriori that the
-			neighbor table can hold entries for maximum node density.</t>
-            <t><list style="letters">
-            <t>First Come First Serve (FCFS) policy</t>
-            <t>Least Recently Used (LRU) policy</t>
-			</list>
+			policies are trivial to implement they may not be able to deal with
+			the constrained network scenario. Note that such policies can still
+			be utilized or deployed if it is known apriori that the neighbor
+			table can hold entries for maximum node density.</t> 
+			<t><list style="letters"> 
+			<t>First Come First Serve (FCFS) policy</t>
+			<t>Least Recently Used (LRU) policy</t> </list> 
 			The primary distinction between these policies is how it treats a
 			new entry when the neighbor table is full. In case of FCFS policy,
 			the new entry is simply rejected while in the case of LRU, the new
-			entry replaces the least recently used entry.</t>
-			<t>
-			RPL works by initiating a downstream multicast DIO to establish
+			entry replaces the least recently used entry.</t> 
+			<t> RPL works by initiating a downstream multicast DIO to establish
 			upstream network path. Subsequently DAO messages might be sent by
 			the nodes to establish downstream paths to the nodes. Thus the
 			network is flooded with multicast DIO messages initially and
@@ -303,55 +306,138 @@
 			receives a DAO message from all these child nodes. Note that once a
 			node establishes a parent entry or a routing entry on behalf of a
 			directly connected node then it has to also provision a neighbor
-			table entry for it for subsequent unicast traffic.
-			</t>
-			<t>
-			In case of FCFS policy, a node might end up hosting all the
-			neighbor entries based on DIO or DAO messages. Once the table is
+			table entry for it for subsequent unicast traffic.  </t> 
+			<t> In case of FCFS policy, a node might end up hosting all the
+			neighbor entries based on DIO or DAO messages.  Once the table is
 			full and if the node has to switch its parent node, then
 			establishing a neighbor entry would mean evicting some existing
-			entry. 
-            </t>
-			<t>
-			In case of LRU policy, a node might end up churning lot of neighbor
-			entries because once the table gets full and there is a request for
-			new entry, it would result in evicting the least recently used (but
-			active) entry. If at later point of time, there is a traffic for
-			the evicted entry then the old entry has to be reinstated using
-			IPv6 NDP procedure. This would mean reinstating the entry by
-			evicting another least recently used entry. If the node density is
-			very high, then this churn would be substantially high to extent
-			that it would disrupt any routing adjacencies to be established in
-			the network in a stable way.  </t>
-        </section>
-        <section title="Lifecycle of a neighbor entry">
-            <section title="Insertion">
-				<t>
-				IPv6 NDP <xref target="RFC6775"></xref> defines signaling
-				involved in resolving the IPv6 addresses to its corresponding
-				MAC addresses which in turn gets populated in the neighbor
-				table. In case of constrained network, it is desired that such
-				control traffic is minimized and thus the neighbor table
-				entries are populated as part of existing messaging. One
-				example would be when the node receives a DAO message from its
-				immediate child node, it not only makes an addition to the
-				routing table but also creates a neighbor table entry for the
-				node. Thus it eliminates need for additional IPv6 NDP NS/NA
-				messaging involved to resolve MAC address. 
+			entry.  </t>
+			<t> In case of LRU policy, a node might end up churning lot of
+			neighbor entries because once the table gets full and there is
+			a request for new entry, it would result in evicting the least
+			recently used (but active) entry.  If at later point of time,
+			there is a traffic for the evicted entry then the old entry has
+			to be reinstated using IPv6 NDP procedure. This would mean
+			reinstating the entry by evicting another least recently used
+			entry. If the node density is very high, then this churn would
+			be substantially high to extent that it would disrupt any
+			routing adjacencies to be established in the network in a
+			stable way.  </t> 
+		</section> 
+		<section title="Lifecycle of a neighbor entry"> 
+			<section title="Insertion"> 
+				<t> 
+				IPv6 NDP <xref target="RFC6775"/> defines signaling involved in
+				resolving the IPv6 addresses to its corresponding MAC addresses
+				which in turn gets populated in the neighbor table. In case of
+				constrained network, it is desired that such control traffic is
+				minimized and thus the neighbor table entries are populated as
+				part of existing messaging. One example would be when the node
+				receives a DAO message from its immediate child node, it not
+				only makes an addition to the routing table but also creates a
+				neighbor table entry for the node. Thus it eliminates need for
+				additional IPv6 NDP NS/NA messaging involved to resolve MAC
+				address. Similar hueristic is made use to add neighbor entries
+				in other cases as well. Following are the possible signaling
+				scenarios in which case a neighbor entry may get added.
 				</t>
-                <t>Cases where nbr entry is added:</t>
-                    <t>PAC_Pre-auth: PaC node needs to add PRE node's neighbor entry</t>
-                    <t>PRE_Pre-auth: PRE node needs to add PaC nodes neighbor entry</t>
-                    <t>RPL-Parent: </t>
-                    <t>RPL-Direct child: </t>
-                    <t>Runtime using NS/NA</t>
+				<t>Node Joining procedure: A new joinee node discovers a relay
+				element to initiate its authentication procedure. At the end of
+				the discovery phase the new joinee node would have known the
+				link local IP address of the relay element and a corresponding
+				entry in the neighbor table would be added.
+				</t>
+				<t>
+				The PANA relay element (PRE) on reception of signaling message may
+				decide to allow the new joining node to initiate the
+				authentication procedure through itself. Relay element does not
+				hold any state information on behalf of the new joinee node
+				except for its neighbor table entry. Thus in the <xref
+				target="sample_top"/> the new joinee node may select node
+				N3 as its PRE, in which case N3 has to add a neighbor entry on
+				behalf of the new joinee node.
+				</t>
+				<t>
+				Post authentication the node enters into network discovery
+				phase. The node selects one or more of its neighboring peer as
+				its preferred parent based on the DIO received from these
+				peers. Note that the node's selected relay element and its
+				preferred parent may not be the same. The preferred parent
+				serves as a default router node to which all its upstream
+				traffic is directed. Thus a neighbor entry on behalf of
+				preferred parent needs to be added. In <xref
+				target="sample_top" /> node N5 selects N3 as its preferred
+				parent. This case N5 needs to add neighbor entry on behalf of
+				N3 which is its directly connected RPL preferred parent.
+				</t>
+				<t>
+				On selection of preferred parent, the node may send a DAO
+				message to its preferred parent all the way to the root to
+				estalish a downstream path. The preferred parent thus has to
+				maintain a neighbor entry on behalf of the directly connected
+				child node. For example, in the <xref target="sample_top"/>,
+				node N3 needs to maintain a neighbor entry on behalf of N5
+				which is its directly connected child node. Nodes N6 and N7 are
+				grand-child nodes for node N3 for whom no neighbor entry is
+				required.
+				</t>
+				<t>
+				IPv6 NDP procedures might still be used in cases where the
+				neighbor entry needs to be refreshed on lifetime expiry.
+				</t>
+				<t>
+				This document expects the neighbor management policy to
+				remember the reason why the neighbor entry is inserted. As
+				described in the later sections, this reason will help the
+				policy to prioritize the entries in case an eviction is forced.
+				</t>
+            </section>
+            <section title="Deletion">
+				<t>It is imperative that an unwanted neighbor entry be removed
+				as soon as possible. This section talks about different cases
+				in which neighbor entry can be deleted.
+				</t>
+				<t>
+				Route Invalidation: When the child node decides to change its
+				preferred parent, the RPL specifications allows the node to
+				send a no-path DAO message to invalidate the route along the
+				previous path(s). A directly connected parent node can use this
+				message to clear the neighbor entry. While the entry can be
+				immediately cleared, usually the implementations choose to wait
+				a small amount of time before clearing the entry.  This is to
+				avoid any impact on the in-transit traffic. Thus this also
+				establishes the importance of route invalidation to achieve
+				optimized neighbor table utilization.
+				</t>
+				<t>
+				<xref target="RFC6775"/>, ND optimizations for 6LoWPANs,
+				section 5.5.3. talks about deleting the entries in case the NUD
+				(neighbor unreachability detection) fails either due to no
+				response to NS messages or due to failure response. Neighbor
+				entries in such cases should be deleted. An example where NUD
+				NS would fail because of no response is the case where the
+				child node swtiches its parent due to link unavailability. The
+				parent in such a case would not receive the no-path DAO message
+				or any other traffic from the child node. Thus on entry
+				lifetime expiry, the parent node would send NS which would fail
+				with no response, thus triggering entry deletion.
+				</t>
             </section>
             <section title="Eviction">
-                <t>faster eviction of unwanted entries
-                Post authentication, the new joining node may not necessarily select the same relay element as a parent node. In such cases, it is better to evict
-                Parent switching can be a cause lot of unwanted entries. Require optimized route invalidation.                
-                Impact of direct child eviction</t>
-            </section>
+				<t>
+				The eviction rules have a major impact on the neighbor
+				management policy. Eviction rules are used when the policy has
+				to forcibly remove an active neighbor entry from the table to
+				make space for the new (hopefully higher priority) entry. The
+				eviction policy may take into account several considerations
+				such as the reason why the entry was made, is the entry in
+				active use currently, how good (for e.g., based on link
+				estimation) the entry currently is.
+				</t>
+				<section title="Eviction for directly connected routing entries">
+					<t>Impact of direct child eviction</t>
+				</section>
+			</section>
             <section title="Reinforcement">
                 <t>talk about how to maintain entry freshness, estimation parameters etc</t>
                 <t>Sample mechanism employed by Contiki for link estimation and reinforcement.</t>
