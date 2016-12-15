@@ -11,7 +11,6 @@
 <!ENTITY RFC6550 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6550.xml">
 <!ENTITY RFC6775 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6775.xml">
 <!ENTITY RFC5191 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5191.xml">
-<!ENTITY I-D.narten-iana-considerations-rfc2434bis SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.narten-iana-considerations-rfc2434bis.xml">
 ]>
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 <!-- used by XSLT processors -->
@@ -178,7 +177,9 @@
 		protocol. For RPL, both the storing and non-storing mode of operations
 		are considered. We also provide a sample neighbor management policy
 		which can be used in such networks with its limitations and
-		assumptions.</t>
+		assumptions. The aim of such a policy is to retain set of neighbor
+		cache entries with high quality links such that routing adjacencies are
+		stablized.</t>
 
 		<t>For the rest of this document consider the following topology:
 		<figure align="center" anchor="sample_top">
@@ -197,13 +198,13 @@
 |         /   \            |
 |        /     \           |
 |      (N1)   (N2)         |
-|        :     / \         |
-|         :   /   \        |
-|          : /     \       |
-|          (N3)   (N4)     |
-|          / \     :       |
-|         /   \   :        |
-|        /     \ :         |
+|      / :     / \         |
+|     /   :   /   \        |
+|    /     : /     \       |
+|  (N8)    (N3)   (N4)     |
+|    :     / \     :       |
+|     :   /   \   :        |
+|      : /     \ :         |
 |      (N5)   (New)        |
 |      / \                 |
 |     /   \                |
@@ -213,7 +214,6 @@
 |        6Lo Network       |
 +--------------------------+ 
             ]]></artwork>
-
         <postamble>Sample Topology</postamble>
       </figure>
     </t>
@@ -385,6 +385,50 @@
 				IPv6 NDP procedures might still be used in cases where the
 				neighbor entry needs to be refreshed on lifetime expiry.
 				</t>
+
+				<t>The sample call flow shows the signaling cases where an NCE
+				could be added.
+                <figure align="center" anchor="callflow">
+                <!-- <preamble>Preamble text - can be omitted or empty.</preamble> -->
+                <artwork align="center"><![CDATA[
+                                 RPL
+       New           PRE         Parent        PAA
+        |             |            |            |
+        |  PRE Disc   |            |            |
+        |<----------->|            |            |
+        |             |            |            |
+  add_NCE(PRE)        |            |            |
+        |             |            |            |
+        |    PCI      |            |            |
+        |------------>|            |            |
+        |             |            |            |
+        |        add_NCE(new)      |            |
+        |             |            |            |
+        |             |  AuthProc  |            |
+        |<----------->|<----------------------->|
+        |             |            |            |
+        |             |  RPL-DIO   |            |
+        |<-------------------------|            |
+        |             |            |            |
+  add_NCE(parent)     |            |            |
+        |             |  RPL-DAO   |            |
+        |------------------------->|            |
+        |             |            |            |
+        |             |       add_NCE(new)      |
+        |             |            |            |
+on NCE lifetime       |            |            |
+     expiry           |            |            |
+        |             |  NS        |            |
+        |------------------------->|            |
+        |             |            |            |
+        |             | NA(Status) |            |
+        |<-------------------------|            |
+        |             |            |            |
+                ]]></artwork>
+                <postamble>Call Flow</postamble>
+                </figure>
+                </t>
+
 				<t>
 				This document expects the neighbor management policy to
 				remember the reason why the neighbor entry is inserted. As
@@ -435,32 +479,143 @@
 				estimation) the entry currently is.
 				</t>
 				<section title="Eviction for directly connected routing entries">
-					<t>Impact of direct child eviction</t>
+					<t>
+					This section talks about implications of an eviction in
+					which a parent node decides of evicting a directly
+					connected routing child entry. In the sample topology <xref
+					target="sample_top"/>, lets assume N3 needs to evict N5
+					from its neighbor cache. In case of RPL's storing mode of
+					operation, eviction of directly connected routing child
+					entry also has impact on all the sub-childs. Thus not only
+					will it result in impacting N5 but also nodes N6 and N7. It
+					is important to note that such an eviction has less impact
+					on RPL's non-storing mode of operation i.e. in case of
+					non-storing mode N5 might end up selecting alternate parent
+					N8 and does not result in any additional control overhead
+					for node N6 and N7.
+                    </t>
+                    <t>
+					Thus RPL's non-storing mode of operation provides
+					additional eviction flexibility for a neighbor management
+					policy in terms evicting directly connected child entries.
+                    </t>
 				</section>
 			</section>
             <section title="Reinforcement">
-                <t>talk about how to maintain entry freshness, estimation parameters etc</t>
-                <t>Sample mechanism employed by Contiki for link estimation and reinforcement.</t>
-                <t>Role of link estimation techniques to prioritize.</t>
+                <t>
+				It is expected that the latest reachability state and metric
+				information be maintained in context to the neighbor entry.
+				With wireless networks, the neighbor table entries
+				prioritization may change over a period of time especially the
+				link quality estimation parameters or the routing metrics.
+				Reinforcement refers to updating the parameters in context to
+				the neighbor entries which helps in prioritizing the entries
+				when it comes to handling eviction. In wireless networks, on
+				reception of incoming packet, the receiver node's physical and
+				MAC layer may derive certain signal reception parameters (such
+				as RSSI, LQI) which can be considered for reinforcement purpose
+				if the corresponding transmitter/source entry in neighbor cache
+				is found. It should be noted that the signal quality parameters
+				may have high variance in 6lo networks and thus statistical
+				techniques (such as weighted averaging) are usually employed
+				for deciding about a link quality over a period of time.
+				Reinforcement can be achieved using one or more of the
+				following techniques:
+                <list style="hanging"> 
+					<t hangText="Passive Monitoring:">Reinforcing the quality
+					parameters using packets received from the source. Trickled
+					DIO, periodic beacons, application traffic etc can be used
+					for such monitoring.</t>
+					<t hangText="Active Probing:">A node may select subset of
+					entries for active probing wherein it sends a message to
+					the neighbor entry's source and can expect a response
+					message back. An example of such probing is <xref
+					target="CONTIKI"/> where unicast DIS is sent to solicit a
+					unicast DIO without impacting the trickle timers. Though it
+					adds a control overhead on the link, periodic probing can
+					help to ascertain connectivity in the absence of any other
+					traffic from the neighboring node.</t>
+                </list> 
+                </t>
                 <!-- SD: To what extent do we want to define probing? Do we only recommend, with one practical example? Or do we want to mandate? -->
             </section>
         </section>
+        <section title="Requirements of a good neighbor management policy">
+            <t>
+            <list style="hanging">
+                <t hangText="Route Stability:"></t>
+                <t hangText="Control overhead:"></t>
+                <t hangText="Easy to implement"></t><!-- SD: I don't think "easy to implement" should be a priority here -->
+            </list> blahblah.
+            </t>
+        </section>
         <section title="Approaches to neighbor management policy">
         <!-- SD: I like the idea to address both proactive and reactive. For proactive, do we plan to advertise the space left in NCE as a DIO metric or similar? -->
-            <section title="Proactive Approach">
-                <t>Is it possible for the child nodes to select parents according to their space availability? In this case, parents need to advertise the free space availability. This is a complex scheme ...blah blah </t>
-            </section>
+            <t>
+			Neighbor management policy depends upon the neighbor cache space
+			availability and the same can be advertised proactively or can be
+			handled reactively.
+            </t>
             <section title="Reactive Approach">
-                <t>Nodes try to join and then fail if space is not available. Easier to implement, more deterministic ... blah</t>
+                <t>
+				In this approach, the nodes select their RPL parent or the
+				relay element purely based on link metrics and subsequently
+				when they try to allocate their neighbor cache entry in the
+				target node, it may fail due to unavailability of the cache
+				space. The failure can be communicated in various depending
+				upon the signaling involved:
+                </t>
+                <t> <list style="hanging">
+                    <t hangText="NS failure:">
+						Section 6.5.3 of <xref target="RFC6775"/> defines a
+						procedure for NS failure handling in case the router's
+						neighbor cache is full. It results in a unicast NA with
+						ARO status field set to two.
+                    </t>
+                    <t hangText="DAO NACK:">
+						Section 6.5.3 of <xref target="RFC6775"/> defines a
+						procedure for NS failure handling in case the router's
+						neighbor cache is full. It results in a unicast NA with
+						ARO status field set to two.
+                    </t>
+                    <t hangText="PANA Failure:">
+						PaC's Authentication session starts with a PCI message
+						been sento PRE.
+                    </t>
+                </list>
+                </t>                
             </section>
-        </section>
-        <section title="Requirements of a good neighbor management policy">
-            <t><list style="letters">
-                <t>Easy to implement</t><!-- SD: I don't think "easy to implement" should be a priority here -->
-                <t>Less control overhead</t>
-                <t>stability of paths, deterministic routes</t>
-                <t>blah</t>
-            </list> blahblah.</t>
+            <section title="Proactive Approach">
+                <t>
+				Neighbor cache availability can be proactively advertised by
+				the parent nodes in the DIO messages and in the PRE discovery
+				messages. A child RPL node may additionally use this
+				information from DIO as part of parent selection process. In
+				case on new joinee node, the node may use PRE discovery
+				messages with space availability information to select a PRE
+				node. Proactive signaling of neighbor cache space availability
+				will help the nodes to select the parent node or relay node
+				such that the failure signaling due to cache full event can be
+				avoided.
+                </t>
+                <t>
+				Currently there is no standard way of signaling such neighbor
+				cache space availability information. RPL's DIO messages carry
+				metric information and can be augmented with neighbor cache
+				space as an additional metric. In case of PRE discovery however
+				there is no standard way of defining this information since the
+				PRE discovery procedure itself is not standardized. 
+                </t>
+                <t>
+				In a wireless or shared bus network, a multicast DIO metric
+				advertisement reaches may reach several child nodes eventually
+				everyone responding by selecting the same parent node causing
+				neighbor table to be exhausted. Thus the failure handling
+				approaches defined in the Reactive Approach section applies
+				here as well. But importantly the failure signaling will be
+				significantly reduced because of proactive advertisement.
+                </t>
+            </section>
         </section>
     </section>
     <section title="Reservation based Neighbor Management Policy">
@@ -469,7 +624,9 @@
         E.g. force NS before switch, so we provision our entry at the future parent before switching.
         Also, with 6lowpan-nd, my understanding is that not only children and parent end up in the table.
         How shall we handle other nodes present in the cache, how to we identify children? -->
-        <t>Reservation for direct children and pre-auth entries. Parent nodes can still occupy the reserved entries since they could be evicted if necessary.
+		<t>Reservation for direct children and pre-auth entries. Parent nodes
+		can still occupy the reserved entries since they could be evicted if
+		necessary.
         Describe the actual policy here.</t>
         <t><figure align="center" anchor="reserv_table">
         <!-- <preamble>Preamble text - can be omitted or empty.</preamble> -->
@@ -517,16 +674,10 @@
 
     <section anchor="IANA" title="IANA Considerations">
       <t>This memo includes no request to IANA.</t>
-
-      <t>All drafts are required to have an IANA considerations section (see
-      <xref target="I-D.narten-iana-considerations-rfc2434bis">the update of
-      RFC 2434</xref> for a guide). If the draft does not require IANA to do
-      anything, the section contains an explicit statement that this is the
-      case (as above). If there are no requirements for IANA, the section will
-      be removed during conversion into an RFC by the RFC Editor.</t>
     </section>
 
     <section anchor="Security" title="Security Considerations">
+        <t> Add DoS attacks possibily on nbr table </t>
       <t>All drafts are required to have a security considerations section.
       See <xref target="RFC3552">RFC 3552</xref> for a guide.</t>
     </section>
@@ -550,10 +701,10 @@
 
     <references title="Normative References">
       <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
-      &RFC2119;
+        &RFC2119;
 
         <reference anchor="Woo_et_al">
-        <!-- the following is the minimum to make xml2rfc happy -->
+            <!-- the following is the minimum to make xml2rfc happy -->
 
             <front>
                 <title>Taming the Underlying Challenges of Reliable Multihop Routing in Sensor Networks</title>
@@ -569,9 +720,8 @@
                 <date year="2003" />
             </front>
         </reference>
+        
         <reference anchor="Dawans_et_al">
-        <!-- the following is the minimum to make xml2rfc happy -->
-
             <front>
                 <title>On Link Estimation in Dense RPL Deployments</title>
                 <author initials="S" surname="Dawans">
@@ -586,6 +736,16 @@
                 <date year="2012" />
             </front>
         </reference>
+        
+        <reference anchor="CONTIKI" target="http://www.contiki-os.org">
+            <front>
+                <title>Contiki: The Open Source OS for IoT</title>
+                <author>
+                    <organization>Thingsquare</organization>
+                </author>
+                <date year="2012"/>
+            </front>
+        </reference>
     </references>
 
     <references title="Informative References">
@@ -598,8 +758,6 @@
       &RFC6775;
 
       &RFC5191;
-
-      &I-D.narten-iana-considerations-rfc2434bis;
 
       <!-- A reference written by by an organization not a person. -->
 
