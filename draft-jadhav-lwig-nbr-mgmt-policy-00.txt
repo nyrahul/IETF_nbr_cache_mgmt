@@ -5,11 +5,11 @@
 LWIG                                                      R. Jadhav, Ed.
 Internet-Draft                                                  R. Sahoo
 Intended status: Informational                               Huawei Tech
-Expires: June 15, 2017                                      S. Duquennoy
+Expires: June 18, 2017                                      S. Duquennoy
                                                                    Inria
                                                              J. Eriksson
                                                                     SICS
-                                                       December 12, 2016
+                                                       December 15, 2016
 
 
                  Neighbor Management Policy for 6LoWPAN
@@ -36,7 +36,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on June 15, 2017.
+   This Internet-Draft will expire on June 18, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Jadhav, et al.            Expires June 15, 2017                 [Page 1]
+Jadhav, et al.            Expires June 18, 2017                 [Page 1]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -70,26 +70,26 @@ Table of Contents
      2.2.  Trivial neighbor management policies  . . . . . . . . . .   6
      2.3.  Lifecycle of a neighbor entry . . . . . . . . . . . . . .   7
        2.3.1.  Insertion . . . . . . . . . . . . . . . . . . . . . .   7
-       2.3.2.  Deletion  . . . . . . . . . . . . . . . . . . . . . .   8
-       2.3.3.  Eviction  . . . . . . . . . . . . . . . . . . . . . .   8
+       2.3.2.  Deletion  . . . . . . . . . . . . . . . . . . . . . .   9
+       2.3.3.  Eviction  . . . . . . . . . . . . . . . . . . . . . .   9
          2.3.3.1.  Eviction for directly connected routing entries .   9
-       2.3.4.  Reinforcement . . . . . . . . . . . . . . . . . . . .   9
-     2.4.  Approaches to neighbor management policy  . . . . . . . .   9
-       2.4.1.  Proactive Approach  . . . . . . . . . . . . . . . . .   9
-       2.4.2.  Reactive Approach . . . . . . . . . . . . . . . . . .   9
-     2.5.  Requirements of a good neighbor management policy . . . .   9
-   3.  Reservation based Neighbor Management Policy  . . . . . . . .   9
-     3.1.  Updates in table structures . . . . . . . . . . . . . . .  10
-     3.2.  Failure handling  . . . . . . . . . . . . . . . . . . . .  10
-     3.3.  Limitations of such a policy  . . . . . . . . . . . . . .  10
-   4.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  10
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
-   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
-     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  11
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .  11
-   Appendix A.  Additional Stuff . . . . . . . . . . . . . . . . . .  12
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  12
+       2.3.4.  Reinforcement . . . . . . . . . . . . . . . . . . . .  10
+     2.4.  Requirements of a good neighbor management policy . . . .  11
+     2.5.  Approaches to neighbor management policy  . . . . . . . .  11
+       2.5.1.  Reactive Approach . . . . . . . . . . . . . . . . . .  11
+       2.5.2.  Proactive Approach  . . . . . . . . . . . . . . . . .  11
+   3.  Reservation based Neighbor Management Policy  . . . . . . . .  12
+     3.1.  Updates in table structures . . . . . . . . . . . . . . .  12
+     3.2.  Failure handling  . . . . . . . . . . . . . . . . . . . .  12
+     3.3.  Limitations of such a policy  . . . . . . . . . . . . . .  13
+   4.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  13
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  13
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  13
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  13
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .  14
+   Appendix A.  Additional Stuff . . . . . . . . . . . . . . . . . .  14
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
 
 1.  Introduction
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Jadhav, et al.            Expires June 15, 2017                 [Page 2]
+Jadhav, et al.            Expires June 18, 2017                 [Page 2]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -134,7 +134,9 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
    (EAP-PANA)[RFC5191] as a network access protocol.  For RPL, both the
    storing and non-storing mode of operations are considered.  We also
    provide a sample neighbor management policy which can be used in such
-   networks with its limitations and assumptions.
+   networks with its limitations and assumptions.  The aim of such a
+   policy is to retain set of neighbor cache entries with high quality
+   links such that routing adjacencies are stablized.
 
    For the rest of this document consider the following topology:
 
@@ -163,9 +165,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-
-
-Jadhav, et al.            Expires June 15, 2017                 [Page 3]
+Jadhav, et al.            Expires June 18, 2017                 [Page 3]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -182,13 +182,13 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
                       |         /   \            |
                       |        /     \           |
                       |      (N1)   (N2)         |
-                      |        :     / \         |
-                      |         :   /   \        |
-                      |          : /     \       |
-                      |          (N3)   (N4)     |
-                      |          / \     :       |
-                      |         /   \   :        |
-                      |        /     \ :         |
+                      |      / :     / \         |
+                      |     /   :   /   \        |
+                      |    /     : /     \       |
+                      |  (N8)    (N3)   (N4)     |
+                      |    :     / \     :       |
+                      |     :   /   \   :        |
+                      |      : /     \ :         |
                       |      (N5)   (New)        |
                       |      / \                 |
                       |     /   \                |
@@ -221,7 +221,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-Jadhav, et al.            Expires June 15, 2017                 [Page 4]
+Jadhav, et al.            Expires June 18, 2017                 [Page 4]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -277,7 +277,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-Jadhav, et al.            Expires June 15, 2017                 [Page 5]
+Jadhav, et al.            Expires June 18, 2017                 [Page 5]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -333,7 +333,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-Jadhav, et al.            Expires June 15, 2017                 [Page 6]
+Jadhav, et al.            Expires June 18, 2017                 [Page 6]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -389,7 +389,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-Jadhav, et al.            Expires June 15, 2017                 [Page 7]
+Jadhav, et al.            Expires June 18, 2017                 [Page 7]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
@@ -399,6 +399,56 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
    IPv6 NDP procedures might still be used in cases where the neighbor
    entry needs to be refreshed on lifetime expiry.
+
+   The sample call flow shows the signaling cases where an NCE could be
+   added.
+
+                                             RPL
+                   New           PRE         Parent        PAA
+                    |             |            |            |
+                    |  PRE Disc   |            |            |
+                    |<----------->|            |            |
+                    |             |            |            |
+              add_NCE(PRE)        |            |            |
+                    |             |            |            |
+                    |    PCI      |            |            |
+                    |------------>|            |            |
+                    |             |            |            |
+                    |        add_NCE(new)      |            |
+                    |             |            |            |
+                    |             |  AuthProc  |            |
+                    |<----------->|<----------------------->|
+                    |             |            |            |
+                    |             |  RPL-DIO   |            |
+                    |<-------------------------|            |
+                    |             |            |            |
+              add_NCE(parent)     |            |            |
+                    |             |  RPL-DAO   |            |
+                    |------------------------->|            |
+                    |             |            |            |
+                    |             |       add_NCE(new)      |
+                    |             |            |            |
+            on NCE lifetime       |            |            |
+                 expiry           |            |            |
+                    |             |  NS        |            |
+                    |------------------------->|            |
+                    |             |            |            |
+                    |             | NA(Status) |            |
+                    |<-------------------------|            |
+                    |             |            |            |
+
+                                 Call Flow
+
+                                 Figure 2
+
+
+
+
+
+Jadhav, et al.            Expires June 18, 2017                 [Page 8]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
 
    This document expects the neighbor management policy to remember the
    reason why the neighbor entry is inserted.  As described in the later
@@ -442,69 +492,152 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
    was made, is the entry in active use currently, how good (for e.g.,
    based on link estimation) the entry currently is.
 
+2.3.3.1.  Eviction for directly connected routing entries
+
+   This section talks about implications of an eviction in which a
+   parent node decides of evicting a directly connected routing child
+   entry.  In the sample topology Figure 1, lets assume N3 needs to
+   evict N5 from its neighbor cache.  In case of RPL's storing mode of
 
 
 
-Jadhav, et al.            Expires June 15, 2017                 [Page 8]
+Jadhav, et al.            Expires June 18, 2017                 [Page 9]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
-2.3.3.1.  Eviction for directly connected routing entries
+   operation, eviction of directly connected routing child entry also
+   has impact on all the sub-childs.  Thus not only will it result in
+   impacting N5 but also nodes N6 and N7.  It is important to note that
+   such an eviction has less impact on RPL's non-storing mode of
+   operation i.e. in case of non-storing mode N5 might end up selecting
+   alternate parent N8 and does not result in any additional control
+   overhead for node N6 and N7.
 
-   Impact of direct child eviction
+   Thus RPL's non-storing mode of operation provides additional eviction
+   flexibility for a neighbor management policy in terms evicting
+   directly connected child entries.
 
 2.3.4.  Reinforcement
 
-   talk about how to maintain entry freshness, estimation parameters etc
+   It is expected that the latest reachability state and metric
+   information be maintained in context to the neighbor entry.  With
+   wireless networks, the neighbor table entries prioritization may
+   change over a period of time especially the link quality estimation
+   parameters or the routing metrics.  Reinforcement refers to updating
+   the parameters in context to the neighbor entries which helps in
+   prioritizing the entries when it comes to handling eviction.  In
+   wireless networks, on reception of incoming packet, the receiver
+   node's physical and MAC layer may derive certain signal reception
+   parameters (such as RSSI, LQI) which can be considered for
+   reinforcement purpose if the corresponding transmitter/source entry
+   in neighbor cache is found.  It should be noted that the signal
+   quality parameters may have high variance in 6lo networks and thus
+   statistical techniques (such as weighted averaging) are usually
+   employed for deciding about a link quality over a period of time.
+   Reinforcement can be achieved using one or more of the following
+   techniques:
 
-   Sample mechanism employed by Contiki for link estimation and
-   reinforcement.
+   Passive Monitoring:  Reinforcing the quality parameters using packets
+      received from the source.  Trickled DIO, periodic beacons,
+      application traffic etc can be used for such monitoring.
 
-   Role of link estimation techniques to prioritize.
+   Active Probing:  A node may select subset of entries for active
+      probing wherein it sends a message to the neighbor entry's source
+      and can expect a response message back.  An example of such
+      probing is [CONTIKI] where unicast DIS is sent to solicit a
+      unicast DIO without impacting the trickle timers.  Though it adds
+      a control overhead on the link, periodic probing can help to
+      ascertain connectivity in the absence of any other traffic from
+      the neighboring node.
 
-2.4.  Approaches to neighbor management policy
 
-2.4.1.  Proactive Approach
 
-   Is it possible for the child nodes to select parents according to
-   their space availability?  In this case, parents need to advertise
-   the free space availability.  This is a complex scheme ...blah blah
 
-2.4.2.  Reactive Approach
 
-   Nodes try to join and then fail if space is not available.  Easier to
-   implement, more deterministic ... blah
 
-2.5.  Requirements of a good neighbor management policy
 
-   a.  Easy to implement
+Jadhav, et al.            Expires June 18, 2017                [Page 10]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
-   b.  Less control overhead
 
-   c.  stability of paths, deterministic routes
+2.4.  Requirements of a good neighbor management policy
 
-   d.  blah
+   Route Stability:
+
+   Control overhead:
+
+   Easy to implement
 
    blahblah.
+
+2.5.  Approaches to neighbor management policy
+
+   Neighbor management policy depends upon the neighbor cache space
+   availability and the same can be advertised proactively or can be
+   handled reactively.
+
+2.5.1.  Reactive Approach
+
+   In this approach, the nodes select their RPL parent or the relay
+   element purely based on link metrics and subsequently when they try
+   to allocate their neighbor cache entry in the target node, it may
+   fail due to unavailability of the cache space.  The failure can be
+   communicated in various depending upon the signaling involved:
+
+   NS failure:  Section 6.5.3 of [RFC6775] defines a procedure for NS
+      failure handling in case the router's neighbor cache is full.  It
+      results in a unicast NA with ARO status field set to two.
+
+   DAO NACK:  Section 6.5.3 of [RFC6775] defines a procedure for NS
+      failure handling in case the router's neighbor cache is full.  It
+      results in a unicast NA with ARO status field set to two.
+
+   PANA Failure:  PaC's Authentication session starts with a PCI message
+      been sento PRE.
+
+2.5.2.  Proactive Approach
+
+   Neighbor cache availability can be proactively advertised by the
+   parent nodes in the DIO messages and in the PRE discovery messages.
+   A child RPL node may additionally use this information from DIO as
+   part of parent selection process.  In case on new joinee node, the
+   node may use PRE discovery messages with space availability
+   information to select a PRE node.  Proactive signaling of neighbor
+   cache space availability will help the nodes to select the parent
+   node or relay node such that the failure signaling due to cache full
+   event can be avoided.
+
+
+
+
+
+Jadhav, et al.            Expires June 18, 2017                [Page 11]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
+   Currently there is no standard way of signaling such neighbor cache
+   space availability information.  RPL's DIO messages carry metric
+   information and can be augmented with neighbor cache space as an
+   additional metric.  In case of PRE discovery however there is no
+   standard way of defining this information since the PRE discovery
+   procedure itself is not standardized.
+
+   In a wireless or shared bus network, a multicast DIO metric
+   advertisement reaches may reach several child nodes eventually
+   everyone responding by selecting the same parent node causing
+   neighbor table to be exhausted.  Thus the failure handling approaches
+   defined in the Reactive Approach section applies here as well.  But
+   importantly the failure signaling will be significantly reduced
+   because of proactive advertisement.
 
 3.  Reservation based Neighbor Management Policy
 
    Reservation for direct children and pre-auth entries.  Parent nodes
    can still occupy the reserved entries since they could be evicted if
    necessary.  Describe the actual policy here.
-
-
-
-
-
-
-
-
-Jadhav, et al.            Expires June 15, 2017                 [Page 9]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
-
 
      <- - - - - - - - - - - Routing Parents - - - - - - - - - - - - ->
      +----------------------+----------------------------------------+
@@ -514,7 +647,7 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
                 Reservation for neighbors based on function
 
-                                 Figure 2
+                                 Figure 3
 
 3.1.  Updates in table structures
 
@@ -530,6 +663,16 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
    How to handle NS rejection when NBR table is full?  What does
    6Lowpan-ND say in the context?
+
+
+
+
+
+
+Jadhav, et al.            Expires June 18, 2017                [Page 12]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
 
 3.3.  Limitations of such a policy
 
@@ -551,22 +694,9 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
    This memo includes no request to IANA.
 
-   All drafts are required to have an IANA considerations section (see
-   the update of RFC 2434 [I-D.narten-iana-considerations-rfc2434bis]
-   for a guide).  If the draft does not require IANA to do anything, the
-
-
-
-Jadhav, et al.            Expires June 15, 2017                [Page 10]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
-
-
-   section contains an explicit statement that this is the case (as
-   above).  If there are no requirements for IANA, the section will be
-   removed during conversion into an RFC by the RFC Editor.
-
 6.  Security Considerations
+
+   Add DoS attacks possibily on nbr table
 
    All drafts are required to have a security considerations section.
    See RFC 3552 [RFC3552] for a guide.
@@ -574,6 +704,9 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 7.  References
 
 7.1.  Normative References
+
+   [CONTIKI]  Thingsquare, "Contiki: The Open Source OS for IoT", 2012,
+              <http://www.contiki-os.org>.
 
    [Dawans_et_al]
               Dawans, S., Duquennoy, S., and O. Bonaventure, "On Link
@@ -589,17 +722,19 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
               Challenges of Reliable Multihop Routing in Sensor
               Networks", 2003.
 
+
+
+
+Jadhav, et al.            Expires June 18, 2017                [Page 13]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
 7.2.  Informative References
 
    [DOMINATION]
               Mad Dominators, Inc., "Ultimate Plan for Taking Over the
               World", 1984, <http://www.example.com/dominator.html>.
-
-   [I-D.narten-iana-considerations-rfc2434bis]
-              Narten, T. and H. Alvestrand, "Guidelines for Writing an
-              IANA Considerations Section in RFCs", draft-narten-iana-
-              considerations-rfc2434bis-09 (work in progress), March
-              2008.
 
    [RFC3552]  Rescorla, E. and B. Korver, "Guidelines for Writing RFC
               Text on Security Considerations", BCP 72, RFC 3552,
@@ -610,13 +745,6 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
               and A. Yegin, "Protocol for Carrying Authentication for
               Network Access (PANA)", RFC 5191, DOI 10.17487/RFC5191,
               May 2008, <http://www.rfc-editor.org/info/rfc5191>.
-
-
-
-Jadhav, et al.            Expires June 15, 2017                [Page 11]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
-
 
    [RFC6550]  Winter, T., Ed., Thubert, P., Ed., Brandt, A., Hui, J.,
               Kelsey, R., Levis, P., Pister, K., Struik, R., Vasseur,
@@ -647,6 +775,17 @@ Authors' Addresses
    Email: rahul.ietf@gmail.com
 
 
+
+
+
+
+
+
+Jadhav, et al.            Expires June 18, 2017                [Page 14]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
+
+
    Rabi Narayan Sahoo
    Huawei Tech
    Kundalahalli Village, Whitefield,
@@ -666,12 +805,6 @@ Authors' Addresses
 
    Phone: +33 768227731
    Email: simon.duquennoy@inria.fr
-
-
-
-Jadhav, et al.            Expires June 15, 2017                [Page 12]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
    Joakim Eriksson
@@ -704,25 +837,4 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN    December 2016
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Jadhav, et al.            Expires June 15, 2017                [Page 13]
+Jadhav, et al.            Expires June 18, 2017                [Page 15]
