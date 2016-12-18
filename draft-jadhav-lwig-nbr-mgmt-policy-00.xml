@@ -9,6 +9,7 @@
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
 <!ENTITY RFC3552 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3552.xml">
 <!ENTITY RFC6550 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6550.xml">
+<!ENTITY RFC6345 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6345.xml">
 <!ENTITY RFC6775 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6775.xml">
 <!ENTITY RFC5191 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5191.xml">
 ]>
@@ -225,8 +226,10 @@
 
 			<t>PaC: PANA Client. New joining node which is yet to be
 			authenticated.</t>
-			<t>PRE: PANA Relay Element. An already authenticated and network
-			joined node which acts as a relay element for PaCs.</t>
+            <t>PRE: PANA Relay Element. <xref target="RFC6345" /> describes a
+            mechanism for an already authenticated and network joined node to
+            as a relay element for PaCs to complete the authentication
+            procedure on multi-hop networks.</t>
 			<t>PAA: PANA Auth Agent. Auth server which hosts the credentials
 			database. PaC will handshake with PAA to complete authentication
 			procedure.</t>
@@ -344,8 +347,10 @@
 				<t>Node Joining procedure: A new joinee node discovers a relay
 				element to initiate its authentication procedure. At the end of
 				the discovery phase the new joinee node would have known the
-				link local IP address of the relay element and a corresponding
-				entry in the neighbor table would be added.
+                link local IP address of the relay element. The joinee node
+                will send an unsecured-NS to the relay element to solicit it's
+                NA. The PRE may send a NA with the appropriate status code as
+                defined in section 6.5.3 of <xref target="RFC6775" />.
 				</t>
 				<t>
 				The PANA relay element (PRE) on reception of signaling message may
@@ -397,6 +402,12 @@
         |  PRE Disc   |            |            |
         |<----------->|            |            |
         |             |            |            |
+        |   unsec-NS  |            |            |
+        |------------>|            |            |
+        |             |            |            |
+        | unsec-NA(status)         |            |
+        |<------------|            |            |
+        |             |            |            |
   add_NCE(PRE)        |            |            |
         |             |            |            |
         |    PCI      |            |            |
@@ -418,11 +429,16 @@
         |             |            |            |
 on NCE lifetime       |            |            |
      expiry           |            |            |
-        |             |  NS        |            |
+        |            sec-NS        |            |
         |------------------------->|            |
         |             |            |            |
-        |             | NA(Status) |            |
+        |             |        upd_NCE(new)     |
+        |             |            |            |
+        |           sec-NA(Status) |            |
         |<-------------------------|            |
+        |             |            |            |
+upd_NCE(parent)       |            |            |
+        |             |            |            |
         |             |            |            |
                 ]]></artwork>
                 <postamble>Call Flow</postamble>
@@ -431,9 +447,12 @@ on NCE lifetime       |            |            |
 
 				<t>
 				This document expects the neighbor management policy to
-				remember the reason why the neighbor entry is inserted. As
-				described in the later sections, this reason will help the
-				policy to prioritize the entries in case an eviction is forced.
+                remember the reason why the neighbor entry is inserted.
+                Secondly, the router may remember whether the NS received was
+                secured or unsecured and accordingly use it to prioritize
+                eviction entries. As described in the later sections, this
+                reason will help the policy to prioritize the entries in case
+                an eviction is forced.
 				</t>
             </section>
             <section title="Deletion">
@@ -579,8 +598,16 @@ on NCE lifetime       |            |            |
 						ARO status field set to two.
                     </t>
                     <t hangText="PANA Failure:">
-						PaC's Authentication session starts with a PCI message
-						been sento PRE.
+                        PaC's Authentication session starts with a PaC
+                        discovering a PRE. The discovery procedure is not
+                        standardized and can be based upon various factors
+                        including signal strength of discovery messages from
+                        PRE. Post discovery, the PaC needs to send an unsecured
+                        unicast NS message with an ARO containings its
+                        link-local IPv6 address. NS helps to determine whether
+                        the PRE can allocate an NCE for the PaC. PRE
+                        accordingly sends a NA response with appropriate status
+                        field.
                     </t>
                 </list>
                 </t>                
@@ -758,6 +785,8 @@ on NCE lifetime       |            |            |
       &RFC6775;
 
       &RFC5191;
+      
+      &RFC6345;
 
       <!-- A reference written by by an organization not a person. -->
 
