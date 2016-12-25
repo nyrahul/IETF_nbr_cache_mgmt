@@ -668,10 +668,13 @@ upd_NCE(parent)       |            |            |
 						ARO status field set to two.
                     </t>
                     <t hangText="DAO NACK:">
-						Section 6.5.3 of <xref target="RFC6775"/> defines a
-						procedure for NS failure handling in case the router's
-						neighbor cache is full. It results in a unicast NA with
-						ARO status field set to two.
+                        Section [todo] of [todo RPL RFC] specifies on how can
+                        the parent node react to DAOs from child and it could
+                        not make a table entry on behalf of the child node. A
+                        DAO negative ACK with status [todo] could be sent to
+                        the child node to signal such a case. The natural
+                        reaction of the child node would be to switch to an
+                        alternate parent.
                     </t>
                     <t hangText="PANA Failure:">
                         PaC's Authentication session starts with a PaC
@@ -729,7 +732,7 @@ upd_NCE(parent)       |            |            |
         How shall we handle other nodes present in the cache, how to we identify children? -->
 		<t>
         This section defines a sample neighbor management policy, with the
-        primary objective to reduce NCE churn and to ensure stability to
+        primary objective to reduce NCE churn and to ensure stability of
         routing adjacencies. The scheme uses a reservation based policy to
         reserve NCEs for:
         </t>
@@ -757,24 +760,43 @@ upd_NCE(parent)       |            |            |
         on secured NS/NA messaging (as shown in <xref target="ns_callflow"/>).
         In case of non-storing MOP, a secured NS/NA messaging as shown in <xref
         target="ns_callflow"/> needs to be used.
+        </t>
 
-        Reservation for direct children and pre-auth entries. Parent nodes
-		can still occupy the reserved entries since they could be evicted if
-		necessary.
-        Describe the actual policy here.</t>
         <t><figure align="center" anchor="reserv_table">
         <!-- <preamble>Preamble text - can be omitted or empty.</preamble> -->
 
         <artwork align="center"><![CDATA[
 <- - - - - - - - - - - Routing Parents - - - - - - - - - - - - ->
-+----------------------+----------------------------------------+
-|                      |                              |         |
-+----------------------+------------------------------+---------+
-  Routing Direct-Child                                  Pre-Auth
++---------------------------------------------------------------+
+|                                 |                   |         |
++-----------------------------------------------------+---------+
+  Routing Child                    Routing Parent      Other
             ]]></artwork>
 
-        <postamble>Reservation for neighbors based on function</postamble>
+        <postamble>Reservation of NCEs in neighbor table</postamble>
         </figure>
+        As shown in the figure, the neighbor cache table is partitioned into
+        different entry types. The routing parents can possibly occupy any
+        entry type if found vacant since in case an eviction is sought then the
+        routing parent could be evicted without much impact on the functioning
+        or on the control traffic. The eviction could be done based on reasons
+        specified in section [todo].
+        </t>
+        <t>
+        Routing Child entries are made in context to directly connected peers
+        and these entries are not deleted unless they are unreacable or there
+        is any reason for the parent node to believe that it is no longer the
+        preferred parent for the child node. Deletion may happen based on
+        reasons mentioned in section [todo].
+        </t>
+        <t>
+        Other entries (OTHER_ENT) may be made in response to temporary
+        requirement of making an NCE. One such case is the pre authentication
+        phase where in the relay node makes an entry of the PaC temporarily
+        till the time the authentication phase is completed. The NCE made thus
+        is garbage collected at the end of the lifetime. Also an implementation
+        may choose to keep a lower lifetime for such NCEs depending upon the
+        time taken to complete the authentication process.
         </t>
 
         <section title="Updates in table structures">
@@ -784,14 +806,40 @@ upd_NCE(parent)       |            |            |
             Non-storing mode table mapping:
             </t>
         </section>
-        <section title="Failure handling">
-            <t>How to handle DAO rejection when NBR table is full? </t>
-            <t>How to handle PANA rejection when NBR table is full? </t>
-            <t>How to handle NS rejection when NBR table is full? What does 6Lowpan-ND say in the context?</t>
-        </section>
         <section title="Limitations of such a policy">
-            <t>May result in sub-optimal paths.</t>
-            <t>Certain scenarios where node density is not high enough, it may result in some nodes getting starved i.e. never able to get any free slot and thus never able to join.</t>
+            <t>
+            The reservation based policy mentioned in this section may result
+            in sub-optimal path selection due to lack of NCE resource on the
+            parent nodes. Also the restriction of maximum pre-auth sessions in
+            the form of max OTHER_ENT limits the maximum relay sessions that
+            can be supported on the relay node.
+            </t>
+            <t>
+            The reservation policy allows the parent node to reject the child
+            node's DAO or NS. But the child node cannot remember this rejection
+            and may reattempt the same parent after some time depending upon
+            triggers such as reception of DIO from the same parent who rejected
+            it previously. One of the only way to stop the child node from
+            reattempting such parent selection would be to also include a
+            proactive approach wherein the parent node signals its resource
+            availability in the DIO message as mentioned in section [todo].
+            Such a scheme of signalling parent node's resource availability is
+            not standardized.
+            </t>
+            <t>
+            RPL's storing mode of operation imposes additional restrictions.
+            One such case is where a child node may have a given parent node as
+            its only parent and that parent node's NCE are all used up. In such
+            a case, the child node would keep on retrying and failing to send a
+            DAO through the parent node. Ideally the parent node could have
+            evicted a least used child node or a child node who has an
+            alternate parent available. Evicting such a child node is a complex
+            process and may increase the control overhead as described in
+            section [todo].
+            Thus the reservation based policy requires that the minimum node
+            density is sufficiently high so that every child finds a parent
+            node in its vicinity with enough resources.
+            </t>
         </section>
         
     </section>
