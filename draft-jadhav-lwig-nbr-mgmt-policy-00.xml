@@ -144,8 +144,8 @@
 
 <middle>
 	<section title="Introduction">
-		<t> In a wireless multihop network, the node densities (maximum number
-		devices connected on a single link) may vary significantly depending
+		<t> In a wireless multihop network, the node densities (maximum number of
+		devices connected on a single hop) may vary significantly depending
 		upon deployments/scenarios. While there is some policy control possible
 		with regards to the network size in terms of maximum number of devices
 		connected, it is especially difficult to set a figure on what will be
@@ -153,21 +153,12 @@
 		put an upper limit on max 1000 devices but it is impossible to state
 		what the node density will be in this 1000 node network. </t>
 
-	   <t>Every networked node needs to manage the neighbor entries for
-	   resolving MAC addresses. Linux and other operating systems have used
-	   neighbor management policies which essentially are first-come,
-	   first-serve basis. In case of Linux, the kernel issues a warning when
-	   the neighbor table overflows in which case the usual step taken is to
-	   tune the negighbor cache size. With constrained nodes, this solution
-	   does not help.</t> <!-- SD: Does Linux really has the same problem?
-	   Doesn't dynamic memory allocation basically solve everything? -->
-   
 		<t>A neighbor cache is usually used for populating neighboring one-hop
 		connected nodes information such as MAC address, link local IP address
 		and other state information. Node density has direct implications on
 		the neighbor cache and in constrained network scenario the size of the
 		neighbor cache will be limited. Thus there are chances that a node may
-		not be able to fit all the neighboring nodes in its table cache in
+		not be able to fit all the neighboring nodes in its cache in
 		which case it has to prioritize entries and thus needs a neighbor
 		management policy.</t>
 
@@ -228,7 +219,7 @@
 			authenticated.</t>
             <t>PRE: PANA Relay Element. <xref target="RFC6345" /> describes a
             mechanism for an already authenticated and network joined node to
-            as a relay element for PaCs to complete the authentication
+            act as a relay element for PaCs to complete the authentication
             procedure on multi-hop networks.</t>
 			<t>PAA: PANA Auth Agent. Auth server which hosts the credentials
 			database. PaC will handshake with PAA to complete authentication
@@ -244,9 +235,8 @@
 			would simply use "Routing Child", and make clear in the text we're
 			referring only about direct children, i.e. next hops in the the
 			routing table. --> 
-			<t>Routing Parent: In the sample topology (<xref
-			target="sample_top"/>), N1 and N2 are possible routing parents for
-			N3.</t>
+            <t>Routing Parent: In <xref target="sample_top"/>, N1 and N2 are
+            possible routing parents for N3.</t>
 			<t>Neighbor Cache Entry (NCE): A neighbor entry managed on behalf
 			of directly connected peer.</t>
 			<t>This document also uses terminology described in <xref
@@ -304,7 +294,7 @@
 			upstream network path. Subsequently DAO messages might be sent by
 			the nodes to establish downstream paths to the nodes. Thus the
 			network is flooded with multicast DIO messages initially and
-			similarly there are chances that the same node is end up been
+			similarly there are chances that the same node is ended up been
 			selected as a preferred parent by most of the child nodes and thus
 			receives a DAO message from all these child nodes. Note that once a
 			node establishes a parent entry or a routing entry on behalf of a
