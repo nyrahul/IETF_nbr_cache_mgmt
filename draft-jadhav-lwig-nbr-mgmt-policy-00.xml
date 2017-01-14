@@ -108,7 +108,7 @@
       </address>
     </author>
 
-    <date month="December" year="2016" />
+    <date year="2017" />
 
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
          in the current day for you. If only the current year is specified, xml2rfc will fill 
@@ -136,9 +136,9 @@
          keywords will be used for the search engine. -->
 
     <abstract>
-	  <t>This document describes the problems associated with neighbor
-	  management in constrained multihop networks and a sample neighbor
-	  management policy to deal with it.</t>
+      <t>This document describes the problems associated with neighbor cache
+      management in constrained multihop networks and a sample neighbor
+      management policy to deal with it.</t>
     </abstract>
   </front>
 
@@ -153,25 +153,24 @@
 		put an upper limit on max 1000 devices but it is impossible to state
 		what the node density will be in this 1000 node network. </t>
 
-		<t>A neighbor cache is usually used for populating neighboring one-hop
-		connected nodes information such as MAC address, link local IP address
-		and other state information. Node density has direct implications on
-		the neighbor cache and in constrained network scenario the size of the
-		neighbor cache will be limited. Thus there are chances that a node may
-		not be able to fit all the neighboring nodes in its cache in
-		which case it has to prioritize entries and thus needs a neighbor
-		management policy.</t>
+        <t>A neighbor cache is used for populating neighboring one-hop
+        connected nodes information such as MAC address, link local IP address
+        and other reachability state information. Node density has direct
+        implications on the neighbor cache and in constrained network scenario
+        the size of the neighbor cache will be limited. Thus there are chances
+        that a node may not be able to fit all the neighboring nodes in its
+        cache in which case it has to prioritize entries and thus needs a
+        neighbor management policy.</t>
 
-		<t>In this draft, we present problems related to neighbor management
-		policies by considering a security-enabled multi-hop 6lo network. We
-		specifically consider RPL<xref target="RFC6550"/> as a routing protocol
-		and PANA (EAP-PANA)<xref target="RFC5191"/> as a network access
-		protocol. For RPL, both the storing and non-storing mode of operations
-		are considered. We also provide a sample neighbor management policy
-		which can be used in such networks with its limitations and
-		assumptions. The aim of such a policy is to retain set of neighbor
-		cache entries with high quality links such that routing adjacencies are
-		stablized.</t>
+        <t>This draft presents problems related to neighbor management policies
+        by considering a security-enabled multi-hop 6lo network. This document
+        considers RPL <xref target="RFC6550"/> as a routing protocol and PANA
+        (EAP-PANA) <xref target="RFC5191"/> as a network access protocol. For
+        RPL, both the storing and non-storing mode of operations are
+        considered. We also provide a sample neighbor management policy which
+        can be used in such networks and its limitations. The aim of such a
+        policy is to retain set of neighbor cache entries with high quality
+        links such that routing adjacencies are stablized.</t>
 
 		<t>For the rest of this document consider the following topology:
 		<figure align="center" anchor="sample_top">
@@ -215,13 +214,13 @@
 			in this document are to be interpreted as described in <xref
 			target="RFC2119">RFC 2119</xref>.</t>
 
-			<t>PaC: PANA Client. New joining node which is yet to be
+			<t>PaC(PANA Client): New joining node which is yet to be
 			authenticated.</t>
-            <t>PRE: PANA Relay Element. <xref target="RFC6345" /> describes a
+            <t>PRE(PANA Relay Element): <xref target="RFC6345"/> describes a
             mechanism for an already authenticated and network joined node to
             act as a relay element for PaCs to complete the authentication
             procedure on multi-hop networks.</t>
-			<t>PAA: PANA Auth Agent. Auth server which hosts the credentials
+			<t>PAA(PANA Auth Agent): Auth server which hosts the credentials
 			database. PaC will handshake with PAA to complete authentication
 			procedure.</t>
 			<t>Routing Child: A downstream node who is part of the routing
@@ -235,6 +234,7 @@
 			would simply use "Routing Child", and make clear in the text we're
 			referring only about direct children, i.e. next hops in the the
 			routing table. --> 
+            <!--RJ: Agree. Changed the text accordingly -->
             <t>Routing Parent: In <xref target="sample_top"/>, N1 and N2 are
             possible routing parents for N3.</t>
 			<t>Neighbor Cache Entry (NCE): A neighbor entry managed on behalf
@@ -267,30 +267,30 @@
 <!-- SD: consistency: do we make any difference between "neighbor table" and "neighbor cache"? -->
 			have to be appropriately populated both on a PaC and on the PRE. If
 			a neighbor entry whose authentication is in progress is evicted, it
-			may increase the authentication time drastically.</t>
+			will negatively impact the authentication procedure.</t>
 
 			<t>Another important consideration is that with increased node
-			density, the prioritization based on link estimation parameters
-			might not help since there might be more well connected peers. In
-			dense deployments the number of directly attached neighbors with
-			good quality links might still be higher than the max entries in
-			neighbor cache size.</t> 
+            density, the prioritization based on link estimation parameters
+            might not help since there might be more number of well connected
+            peers. In dense deployments the number of directly attached
+            neighbors with good quality links might still be higher than the
+            max entries in neighbor cache size.</t> 
 		</section> 
 		<section title="Trivial neighbor management policies"> 
 			<t>This section investigates policies which are used by most of the
 			current operating systems for constrained nodes. While such
 			policies are trivial to implement they may not be able to deal with
-			the constrained network scenario. Note that such policies can still
-			be utilized or deployed if it is known apriori that the neighbor
-			table can hold entries for maximum node density.</t> 
+            the constrained network scenario. Note that such policies can still
+            be used if it is known apriori that the neighbor table can hold
+            entries for maximum node density.</t> 
 			<t><list style="letters"> 
 			<t>First Come First Serve (FCFS) policy</t>
 			<t>Least Recently Used (LRU) policy</t> </list> 
 			The primary distinction between these policies is how it treats a
 			new entry when the neighbor table is full. In case of FCFS policy,
-			the new entry is simply rejected while in the case of LRU, the new
-			entry replaces the least recently used entry.</t> 
-			<t> RPL works by initiating a downstream multicast DIO to establish
+            the new entry is simply rejected while with LRU, the new entry
+            replaces the least recently used entry.</t> 
+			<t>RPL works by initiating a downstream multicast DIO to establish
 			upstream network path. Subsequently DAO messages might be sent by
 			the nodes to establish downstream paths to the nodes. Thus the
 			network is flooded with multicast DIO messages initially and
@@ -302,9 +302,7 @@
 			table entry for it for subsequent unicast traffic.  </t> 
 			<t> In case of FCFS policy, a node might end up hosting all the
 			neighbor entries based on DIO or DAO messages.  Once the table is
-			full and if the node has to switch its parent node, then
-			establishing a neighbor entry would mean evicting some existing
-			entry.  </t>
+			full all the subsequent attempts to add an NCE will fail.</t>
 			<t> In case of LRU policy, a node might end up churning lot of
 			neighbor entries because once the table gets full and there is
 			a request for new entry, it would result in evicting the least
@@ -331,17 +329,18 @@
                 neighbor table entry for the node. Thus it eliminates need for
                 additional IPv6 NDP NS/NA messaging involved to resolve MAC
                 address. Similar hueristic is made use to add neighbor entries
-                in other cases as well. Following are the possible signaling
-                scenarios in which case a neighbor entry may get added.
-				</t>
-				<t>Node Joining procedure: A new joinee node discovers a relay
-				element to initiate its authentication procedure. At the end of
-				the discovery phase the new joinee node would have known the
+                in other cases as well. Section 10.3.2 of <xref
+                target="RFC6775"/> describes updation and addition of such
+                NCEs based on roting information packets. Following are the
+                possible signaling scenarios in which case a neighbor entry may
+                get added.  </t>
+                <t>Node Joining procedure: A new joinee node discovers a relay
+                element to initiate its authentication procedure. At the end of
+                the discovery phase the new joinee node would have known the
                 link local IP address of the relay element. The joinee node
                 will send an unsecured-NS to the relay element to solicit it's
                 NA. The PRE may send a NA with the appropriate status code as
-                defined in section 6.5.3 of <xref target="RFC6775" />.
-				</t>
+                defined in section 6.5.3 of <xref target="RFC6775" />.  </t>
 				<t>
 				The PANA relay element (PRE) on reception of signaling message may
 				decide to allow the new joining node to initiate the
