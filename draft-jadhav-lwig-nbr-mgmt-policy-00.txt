@@ -73,14 +73,14 @@ Table of Contents
        2.3.2.  NCE Deletion  . . . . . . . . . . . . . . . . . . . .   9
        2.3.3.  NCE Eviction  . . . . . . . . . . . . . . . . . . . .  10
          2.3.3.1.  Eviction for directly connected routing entries .  10
-       2.3.4.  NCE Reinforcement . . . . . . . . . . . . . . . . . .  10
+       2.3.4.  NCE Reinforcement . . . . . . . . . . . . . . . . . .  11
      2.4.  Requirements of a good neighbor management policy . . . .  11
      2.5.  Approaches to neighbor management policy  . . . . . . . .  11
-       2.5.1.  Reactive Approach . . . . . . . . . . . . . . . . . .  11
+       2.5.1.  Reactive Approach . . . . . . . . . . . . . . . . . .  12
        2.5.2.  Proactive Approach  . . . . . . . . . . . . . . . . .  12
    3.  Reservation based Neighbor Management Policy  . . . . . . . .  13
      3.1.  Limitations of such a policy  . . . . . . . . . . . . . .  14
-   4.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  14
+   4.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  15
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  15
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
@@ -506,6 +506,13 @@ Jadhav, et al.            Expires July 21, 2017                 [Page 9]
 Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
 
 
+   In case of non-storing mode, the no-path DAO cannot be not employed
+   since the previous parent does not having any routing information to
+   be invalidated.  But the previous parent may still contain the NCE on
+   behalf of the child node.  This document recommends use of [RFC6775]
+   section 6.5.3. which allows sending a zero lifetime ARO option in NS
+   for deregistering the corresponding neighbor entry.
+
    [RFC6775], ND optimizations for 6LoWPANs, section 5.5.3. talks about
    deleting the entries in case the NUD (neighbor unreachability
    detection) fails either due to no response to NS messages or due to
@@ -544,6 +551,17 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
    for a neighbor management policy in terms evicting directly connected
    child entries.
 
+
+
+
+
+
+
+Jadhav, et al.            Expires July 21, 2017                [Page 10]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
+
+
 2.3.4.  NCE Reinforcement
 
    It is expected that the latest reachability state and metric
@@ -554,14 +572,6 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
    in context to the NCEs which helps in prioritizing the entries when
    it comes to handling eviction.  In wireless networks, on reception of
    incoming packet, the receiver node's physical and MAC layer may
-
-
-
-Jadhav, et al.            Expires July 21, 2017                [Page 10]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
-
-
    derive certain signal reception parameters (such as RSSI, LQI) which
    can be considered for reinforcement purpose if the corresponding
    transmitter/source entry in neighbor cache is found.  It should be
@@ -601,6 +611,13 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
    availability and the same can be advertised proactively or can be
    handled reactively.
 
+
+
+Jadhav, et al.            Expires July 21, 2017                [Page 11]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
+
+
 2.5.1.  Reactive Approach
 
    In this approach, the nodes select their RPL parent or the relay
@@ -608,15 +625,6 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
    to allocate their NCE in the target node, it may fail due to
    unavailability of the cache space.  The failure can be communicated
    depending upon the signaling involved:
-
-
-
-
-
-Jadhav, et al.            Expires July 21, 2017                [Page 11]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
-
 
    NS failure:  Section 6.5.3 of [RFC6775] defines a procedure for NS
       failure handling in case the router's neighbor cache is full.  It
@@ -657,14 +665,6 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
    standard way of defining this information since the PRE discovery
    procedure itself is not standardized.
 
-   In a wireless or shared bus network, a multicast DIO metric
-   advertisement may reach several child nodes eventually everyone
-   responding by selecting the same parent node causing neighbor cache
-   to be exhausted.  Thus the failure handling approaches defined in the
-   Reactive Approach section applies here as well.  But importantly the
-   failure signaling will be significantly reduced because of proactive
-   advertisement.
-
 
 
 
@@ -673,6 +673,14 @@ Jadhav, et al.            Expires July 21, 2017                [Page 12]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
 
+
+   In a wireless or shared bus network, a multicast DIO metric
+   advertisement may reach several child nodes eventually everyone
+   responding by selecting the same parent node causing neighbor cache
+   to be exhausted.  Thus the failure handling approaches defined in the
+   Reactive Approach section applies here as well.  But importantly the
+   failure signaling will be significantly reduced because of proactive
+   advertisement.
 
 3.  Reservation based Neighbor Management Policy
 
@@ -714,6 +722,14 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
    different entry types.  The routing parents can possibly occupy any
    entry type if found vacant since in case an eviction is sought the
    non-preferred routing parent could be evicted without much impact on
+
+
+
+Jadhav, et al.            Expires July 21, 2017                [Page 13]
+
+Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
+
+
    the functioning or on the control traffic.  The eviction could be
    done based on reasons specified in Section 2.3.3.
 
@@ -722,13 +738,6 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
    is any reason for the parent node to believe that it is no longer the
    preferred parent for the child node.  Deletion may happen based on
    reasons mentioned in Section 2.3.2.
-
-
-
-Jadhav, et al.            Expires July 21, 2017                [Page 13]
-
-Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
-
 
    Other entries (OTHER) may be made in response to temporary
    requirement of making an NCE.  One such case is the pre
@@ -770,21 +779,17 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
    is sufficiently high so that every child finds a parent node in its
    vicinity with enough resources.
 
-4.  Acknowledgements
-
-   This template was derived from an initial version written by Pekka
-   Savola and contributed by him to the xml2rfc project.
-
-
-
-
-
 
 
 Jadhav, et al.            Expires July 21, 2017                [Page 14]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
 
+
+4.  Acknowledgements
+
+   This template was derived from an initial version written by Pekka
+   Savola and contributed by him to the xml2rfc project.
 
 5.  IANA Considerations
 
@@ -827,11 +832,6 @@ Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
               DOI 10.17487/RFC3552, July 2003,
               <http://www.rfc-editor.org/info/rfc3552>.
 
-   [RFC5191]  Forsberg, D., Ohba, Y., Ed., Patil, B., Tschofenig, H.,
-              and A. Yegin, "Protocol for Carrying Authentication for
-              Network Access (PANA)", RFC 5191, DOI 10.17487/RFC5191,
-              May 2008, <http://www.rfc-editor.org/info/rfc5191>.
-
 
 
 
@@ -841,6 +841,11 @@ Jadhav, et al.            Expires July 21, 2017                [Page 15]
 
 Internet-Draft   Neighbor Management Policy for 6LoWPAN     January 2017
 
+
+   [RFC5191]  Forsberg, D., Ohba, Y., Ed., Patil, B., Tschofenig, H.,
+              and A. Yegin, "Protocol for Carrying Authentication for
+              Network Access (PANA)", RFC 5191, DOI 10.17487/RFC5191,
+              May 2008, <http://www.rfc-editor.org/info/rfc5191>.
 
    [RFC6345]  Duffy, P., Chakrabarti, S., Cragie, R., Ohba, Y., Ed., and
               A. Yegin, "Protocol for Carrying Authentication for
@@ -885,11 +890,6 @@ Authors' Addresses
 
    Phone: +91-080-49160700
    Email: rabinarayans@huawei.com
-
-
-
-
-
 
 
 
