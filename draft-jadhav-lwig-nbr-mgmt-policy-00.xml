@@ -230,7 +230,7 @@
 			the directly connected routing child for N3.  N6 and N7 are also
 			part of N3 routing table, they are routing child nodes but not
 			directly connected. For N6 and N7 the document might alternatively
-			use a term grand-child.</t> 
+			use a term grand-child.</t>
 
             <t>Routing Parent: In <xref target="sample_top"/>, N1 and N2 are
             possible routing parents for N3.</t>
