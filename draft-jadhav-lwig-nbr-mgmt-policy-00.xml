@@ -508,6 +508,14 @@ addNCE(parent,reason=PARENT)       |            |
 				of route invalidation to achieve optimized neighbor cache
 				utilization. </t>
 
+                <t>In case of non-storing mode, the no-path DAO cannot be not
+                employed since the previous parent does not having any routing
+                information to be invalidated. But the previous parent may
+                still contain the NCE on behalf of the child node. This
+                document recommends use of <xref target="RFC6775"/> section
+                6.5.3. which allows sending a zero lifetime ARO option in NS
+                for deregistering the corresponding neighbor entry.</t> 
+
 				<t> <xref target="RFC6775"/>, ND optimizations for 6LoWPANs,
 				section 5.5.3. talks about deleting the entries in case the NUD
 				(neighbor unreachability detection) fails either due to no
