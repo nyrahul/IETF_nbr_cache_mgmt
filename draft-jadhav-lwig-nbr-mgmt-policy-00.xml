@@ -214,8 +214,6 @@
 			<t>PaC (PANA Client): New joining node which is yet to be
 			authenticated.</t> 
 
-			<!-- SD: the sentence does not explicitly state what PRE is. (only talks about RFC6345) -->
-			<!-- RJ: Clarified -->
 			<t>PRE (PANA Relay Element): An already authenticated and network
 			joined node which is willing to act as a relay element for PaCs to
 			complete their authentication procedure on multi-hop networks.
@@ -399,9 +397,6 @@ addNCE(PRE,reason=PANA)            |            |
 				retaining the child node's reachability information,
 				establishing a downstream routing path towards the node who
 				originated the DAO.
-				<!-- SD: I think this inaccurate. The DAO is sent to the parent. The information
-wil be later forwarded up, but not through this particular DAO. IPv6 dest is the direct parent.	-->
-				<!-- RJ: Fixed this description -->
 				The preferred parent has to maintain a neighbor entry on behalf
 				of the directly connected child node. For example, in the <xref
 				target="sample_top"/>, node N3 needs to maintain a neighbor
@@ -440,9 +435,6 @@ addNCE(parent,reason=PARENT)       |            |
 				needed since the source routing header carries the global
 				addresses and thus the NCE of the child node should contain the
 				global address.
-				<!-- SD: Note that in non-storing, parents don't even have the link-local of their children,
-for the reason below (DAOs are sent directly to the root)				-->
-				<!-- RJ: Removed reference to link local address, it was unnecessary -->
 				Secondly, the RPL DAO is addressed directly to the root node in
 				case of non-storing mode. Thus RPL messaging cannot be used for
 				creating NCE entries on parent and child, unlike storing MOP.
@@ -496,10 +488,6 @@ addNCE(parent,reason=PARENT)       |            |
 				specifications allows the node to send a no-path DAO message to
 				invalidate the route along the previous path(s). A directly
 				connected parent node can use this message to clear the NCE. 
-				<!-- SD: mention we're talking about storing here.	-->
-				<!-- RJ: Clarified about storing mode here... but this raises
-				an important question about how to clear the NCE on prev parent
-				in non-storing mode --> 
 
 				While the entry can be immediately cleared, usually the
 				implementations choose to wait a small amount of time before
@@ -654,8 +642,6 @@ addNCE(parent,reason=PARENT)       |            |
             </section>
 
             <section anchor="proactive" title="Proactive Approach">
-				<!-- SD: I would use "could" because there is no existing way yet-->
-				<!-- RJ: Corrected. -->
 				<t> Neighbor cache availability could be proactively advertised
 				by the parent nodes in the DIO messages and in the PRE
 				discovery messages. A child RPL node may additionally use this
